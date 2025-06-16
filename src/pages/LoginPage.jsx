@@ -18,7 +18,7 @@ const LoginPage = () => {
     password: "",
   });
 
-  const { login, error, loading } = useLogin();
+  const { login, loading } = useLogin();
 
   const handleRoleToggle = (role) => {
     setActiveRole(role);

@@ -3,7 +3,6 @@ import { loginUser } from "../services/loginService";
 
 export const useLogin = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const login = async (email, password) => {
     setLoading(true);
@@ -13,7 +12,7 @@ export const useLogin = () => {
 
       return response;
     } catch (error) {
-      // console.log("Error from hook", error);
+      // console.log("Error from login hook", error);
 
       return error;
     } finally {
@@ -21,5 +20,5 @@ export const useLogin = () => {
     }
   };
 
-  return { login, error, loading };
+  return { login, loading };
 };

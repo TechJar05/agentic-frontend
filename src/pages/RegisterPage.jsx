@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import agenticLogo from "../assets/agenticLogo.png";
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRegister } from "../hooks/useRegister";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ const RegisterPage = () => {
     username: "",
     password: "",
   });
+
+  const { register, loading } = useRegister();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +41,7 @@ const RegisterPage = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {
       username: "",
@@ -56,10 +59,25 @@ const RegisterPage = () => {
     }
 
     setErrors(newErrors);
-    if (!newErrors.username && !newErrors.password) {
-      // Submit form logic would go here
-      console.log("Form submitted:", formData);
+
+    if (newErrors.username || newErrors.password) {
+      // console.log("Form submission failed due to errors:");
+
+      return;
     }
+    console.log("Form submitted:", formData);
+
+    const response = await register(formData.username, formData.password);
+
+    console.log("Response from handleRegister:", response);
+
+    if (response.status >= 300) {
+      console.log("Registration failed:", response.data);
+      alert("Registration failed: " + response.data.message);
+      return;
+    }
+
+    alert("Success, " + response.data.message);
   };
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4">
@@ -181,9 +199,10 @@ const RegisterPage = () => {
             {/* Login Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium !rounded-button whitespace-nowrap cursor-pointer"
             >
-              Register
+              {loading ? "Loading..." : "Register"}
             </button>
 
             <div className="flex justify-start">
