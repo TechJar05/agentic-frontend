@@ -23,11 +23,13 @@
 // export default App;
 
 // src/App.js
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import MDdashboard from './pages/MDdashboard';
-import ManageEmployee from './pages/ManageEmployee';
-import Layout from './components/Layout';
-import TaskLogs from './pages/TaskLogs';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import MDdashboard from "./pages/MDdashboard";
+import ManageEmployee from "./pages/ManageEmployee";
+import Layout from "./components/Layout";
+import TaskLogs from "./pages/TaskLogs";
+import RegisterPage from "./pages/RegisterPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
@@ -36,7 +38,12 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<MDdashboard />} />
           <Route path="/manage-employee" element={<ManageEmployee />} />
-           <Route path="/task-logs" element={<TaskLogs />} /> 
+          <Route path="/task-logs" element={<TaskLogs />} />
+        </Route>
+
+        <Route path="/authpage">
+          <Route path="/authpage/register" element={<RegisterPage />} />
+          <Route index element={<LoginPage />} />
         </Route>
       </Routes>
     </Router>
@@ -44,4 +51,3 @@ function App() {
 }
 
 export default App;
-
