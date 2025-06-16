@@ -4,7 +4,7 @@ const Navbar = ({ setIsProfileOpen, isProfileOpen }) => {
   return (
     <header className="bg-white shadow-sm z-10">
       <div className="flex items-center justify-between px-6 py-4">
-        <h2 className="text-2xl font-semibold text-gray-800">Welcome, MD</h2>
+        <h2 className="font-semibold text-gray-800">Welcome, MD</h2>
         <div className="relative">
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}

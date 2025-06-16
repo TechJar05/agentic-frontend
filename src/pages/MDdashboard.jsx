@@ -73,13 +73,13 @@ const MDdashboard = () => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 font-bold">
         {metrics.map((metric, index) => (
           <div key={index} className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">{metric.title}</p>
-                <h3 className="text-3xl font-bold mt-1">{metric.value}</h3>
+                <p className="text-black text-sm">{metric.title}</p>
+                <h3 className="text-3xl text-gray-500 mt-1">{metric.value}</h3>
               </div>
               <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-800">
                 <i className={`fas ${metric.icon} text-xl`}></i>
