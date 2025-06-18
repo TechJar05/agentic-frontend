@@ -4,10 +4,15 @@ import { registerUser } from "../services/registerService";
 export const useRegister = () => {
   const [loading, setLoading] = useState(false);
 
-  const register = async (email, password) => {
+  const register = async ({ email, password, phoneNumber, name }) => {
     setLoading(true);
     try {
-      const response = await registerUser(email, password);
+      const response = await registerUser({
+        email,
+        password,
+        phoneNumber,
+        name,
+      });
       // console.log("Response from register hook", response);
 
       return response;
@@ -22,4 +27,3 @@ export const useRegister = () => {
 
   return { register, loading };
 };
-

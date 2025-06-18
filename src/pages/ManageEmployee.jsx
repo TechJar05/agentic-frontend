@@ -1,29 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 const ManageEmployee = () => {
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [showUpdatePhoneModal, setShowUpdatePhoneModal] = useState(false); // State to control the Update Phone modal
-  const [employeeName, setEmployeeName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [taskCapacity, setTaskCapacity] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    phoneNumber: "",
+    taskCapacity: "",
+    department: "",
+  });
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null); // Track which employee is being updated
+  const [employees, setEmployees] = useState([
+    { id: 1, name: "John Doe", phone: "123-456-7890", status: "Active" },
+    { id: 2, name: "Jane Smith", phone: "987-654-3210", status: "Inactive" },
+    { id: 3, name: "Sarah Lee", phone: "555-123-4567", status: "Active" },
+  ]);
+  const [filteredEmployees, setFilteredEmployees] = useState([...employees]);
 
-  const employees = [
-    { id: 1, name: 'John Doe', phone: '123-456-7890', status: 'Active' },
-    { id: 2, name: 'Jane Smith', phone: '987-654-3210', status: 'Inactive' },
-    { id: 3, name: 'Sarah Lee', phone: '555-123-4567', status: 'Active' },
-  ];
+  useEffect(() => {
+    if (searchQuery === "") {
+      setFilteredEmployees(employees);
+      return;
+    }
+    const updatedEmployees = employees.filter((employee) =>
+      employee.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-  const filteredEmployees = employees.filter((employee) =>
-    employee.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    setFilteredEmployees(updatedEmployees);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setFilteredEmployees(employees);
+  }, [employees]);
 
   // Handle form submission for adding an employee
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    alert(`Employee Added: ${employeeName}, ${phoneNumber}, ${taskCapacity}`);
+    alert(`Employee Added: ${JSON.stringify(newEmployee)}`);
     setShowAddEmployeeModal(false);
+    setNewEmployee({
+      name: "",
+      phoneNumber: "",
+      taskCapacity: "",
+      department: "",
+    });
   };
 
   // Handle phone number change for validation
@@ -43,19 +65,53 @@ const ManageEmployee = () => {
   // Open the modal to update phone number and clear previous input
   const openUpdatePhoneModal = (employee) => {
     setSelectedEmployee(employee);
-    setPhoneNumber(''); // Clear phone number input when opening the modal
+    setPhoneNumber(""); // Clear phone number input when opening the modal
     setShowUpdatePhoneModal(true);
+  };
+
+  const handleNewEmployeeChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "phoneNumber") {
+      // Allow only numbers and restrict to 10 digits
+      if (/[^0-9]/.test(value)) {
+        return;
+      }
+
+      if (value.length > 10) {
+        alert("Phone number cannot exeed 10 digits");
+        return;
+      }
+    }
+
+    setNewEmployee((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   // Handle phone number update
   const handleUpdatePhoneSubmit = (e) => {
     e.preventDefault();
     if (phoneNumber.length === 10) {
-      alert(`Phone number for ${selectedEmployee.name} updated to: ${phoneNumber}`);
+      alert(
+        `Phone number for ${selectedEmployee.name} updated to: ${phoneNumber}`
+      );
       setShowUpdatePhoneModal(false);
     } else {
-      alert('Phone number must be exactly 10 digits');
+      alert("Phone number must be exactly 10 digits");
     }
+  };
+
+  const handleDeleteEmployee = (id) => {
+    const updatedEmployees = employees.filter((employee) => {
+      return employee.id !== id;
+    });
+
+    console.log("After Delete: ", updatedEmployees);
+
+    setSearchQuery("");
+    setEmployees(updatedEmployees);
   };
 
   return (
@@ -73,13 +129,16 @@ const ManageEmployee = () => {
 
       {/* Search Bar */}
       <div className="p-6 border-b border-gray-200">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Search Employee
+        </label>
         <div className="relative">
           <input
             type="text"
             placeholder="Search by employee name..."
             className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
           />
           <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
         </div>
@@ -90,38 +149,71 @@ const ManageEmployee = () => {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 w-96 rounded-lg shadow-lg bg-opacity-90">
             <h2 className="text-lg font-semibold mb-4">Add New Employee</h2>
+
             <form onSubmit={handleFormSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Employee Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Employee Name
+                </label>
                 <input
                   type="text"
                   placeholder="Enter employee name"
-                  value={employeeName}
-                  onChange={(e) => setEmployeeName(e.target.value)}
+                  name="name"
+                  value={newEmployee.name}
+                  onChange={(e) => {
+                    handleNewEmployeeChange(e);
+                  }}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   required
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number (+91)
+                </label>
                 <input
                   type="text"
                   placeholder="Enter phone number"
-                  value={phoneNumber}
-                  onChange={handlePhoneChange}
+                  name="phoneNumber"
+                  value={newEmployee.phoneNumber}
+                  onChange={(e) => {
+                    handleNewEmployeeChange(e);
+                  }}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   required
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Task Capacity</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Task Capacity
+                </label>
                 <input
                   type="number"
                   placeholder="Enter task capacity"
-                  value={taskCapacity}
-                  onChange={(e) => setTaskCapacity(e.target.value)}
+                  name="taskCapacity"
+                  value={newEmployee.taskCapacity}
+                  onChange={(e) => {
+                    handleNewEmployeeChange(e);
+                  }}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  required
+                />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Department
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter Department"
+                  name="department"
+                  value={newEmployee.department}
+                  onChange={(e) => {
+                    handleNewEmployeeChange(e);
+                  }}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   required
                 />
@@ -131,13 +223,13 @@ const ManageEmployee = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddEmployeeModal(false)}
-                  className="px-4 py-2 bg-gray-300 text-white rounded-lg hover:bg-gray-400"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#00968a] text-white rounded-lg hover:bg-[#007870]"
+                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
                 >
                   Add Employee
                 </button>
@@ -154,7 +246,9 @@ const ManageEmployee = () => {
             <h2 className="text-lg font-semibold mb-4">Update Phone Number</h2>
             <form onSubmit={handleUpdatePhoneSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
                 <input
                   type="text"
                   placeholder="Enter phone number"
@@ -191,42 +285,67 @@ const ManageEmployee = () => {
         <table className="min-w-full divide-y divide-gray-200 table-auto">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Phone Number
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredEmployees.map((employee) => (
+              // !employee.name.toLowerCase().includes(searchQuery)){return null;}
               <tr key={employee.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-10 w-10 bg-teal-100 rounded-full flex items-center justify-center">
-                      <span className="text-teal-700 font-medium">{employee.name.charAt(0)}</span>
+                      <span className="text-teal-700 font-medium">
+                        {employee.name.charAt(0)}
+                      </span>
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {employee.name}
+                      </div>
                     </div>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{employee.phone}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {employee.phone}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      employee.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      employee.status === "Active"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
                     }`}
                   >
                     {employee.status}
                   </span>
                 </td>
-                <td className=" font- text-sm  px-6 py-4 whitespace-nowrap">
+                <td className="font-text-lg py-4 whitespace-nowrap flex justify-evenly">
+                  {/* <div> */}
                   <button
-                    onClick={() => openUpdatePhoneModal(employee)}  // Open the modal for updating phone
-                    className="px-1 py-1 bg-[#00968a] text-white rounded hover:bg-[#007870]"
+                    onClick={() => openUpdatePhoneModal(employee)} // Open the modal for updating phone
+                    className="px-4 py-2 bg-[#00968a] text-white rounded hover:bg-[#007870]"
                   >
                     Update Phone Number
                   </button>
+                  <button
+                    onClick={() => handleDeleteEmployee(employee.id)} // Open the modal for updating phone
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    Delete Employee
+                  </button>
+                  {/* </div> */}
                 </td>
               </tr>
             ))}
@@ -234,19 +353,16 @@ const ManageEmployee = () => {
         </table>
       </div>
 
+      {/* Employee Table Footer */}
       <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
         <div className="text-sm text-gray-500">
-          Showing <span className="font-medium">1</span> to{' '}
-          <span className="font-medium">{filteredEmployees.length}</span> of{' '}
-          <span className="font-medium">{filteredEmployees.length}</span> employees
-        </div>
-        <div className="flex space-x-2">
-          <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
-            Previous
-          </button>
-          <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
-            Next
-          </button>
+          Showing{" "}
+          <span className="font-medium">
+            {filteredEmployees.length ? 1 : 0}
+          </span>{" "}
+          to <span className="font-medium">{filteredEmployees.length}</span> of{" "}
+          <span className="font-medium">{filteredEmployees.length}</span>{" "}
+          employees
         </div>
       </div>
     </div>
@@ -254,9 +370,6 @@ const ManageEmployee = () => {
 };
 
 export default ManageEmployee;
-
-
-
 
 // import React, { useState } from 'react';
 // import useEmployees from '../hooks/useEmployees';  // Custom hook to fetch employees
@@ -509,5 +622,3 @@ export default ManageEmployee;
 // };
 
 // export default ManageEmployee;
-
-
