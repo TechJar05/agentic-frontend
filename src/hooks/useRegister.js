@@ -22,3 +22,4 @@ export const useRegister = () => {
 
   return { register, loading };
 };
+

@@ -211,7 +211,7 @@ const RegisterPage = () => {
               text-[#10a395]
              hover:cursor-pointer hover:underline mt-6 flex gap-1 justify-end w-fit"
                 onClick={() => {
-                  navigate("/authpage");
+                  navigate("/login");
                 }}
               >
                 <ArrowLeftCircle size={20} className="" />
