@@ -10,20 +10,34 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
+    email: "",
     password: "",
     confirmPassword: "",
+    phoneNumber: "",
   });
 
   const [errors, setErrors] = useState({
-    username: "",
+    email: "",
     password: "",
+    phoneNumber: "",
   });
 
   const { register, loading } = useRegister();
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    // let { name, value } = e.target;
+    const { name } = e.target;
+    let { value } = e.target;
+
+    //allow only numeric input for phone number
+    if (name === "phoneNumber") {
+      if (!/^\d*$/.test(value)) {
+        return;
+      }
+      value = value.trim();
+    }
+
     setFormData({
       ...formData,
       [name]: value,
@@ -44,12 +58,13 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {
-      username: "",
+      email: "",
       password: "",
+      phoneNumber: "",
     };
 
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
+    if (!formData.email.trim()) {
+      newErrors.email = "email is required";
     }
 
     if (formData.password.length < 6) {
@@ -58,16 +73,21 @@ const RegisterPage = () => {
       newErrors.password = "Passwords do not match";
     }
 
+    //force phone number to be 10 digits and all numeric
+    if (formData.phoneNumber.trim().length !== 10) {
+      newErrors.phoneNumber = "Phone number must be 10 digits";
+    }
+
     setErrors(newErrors);
 
-    if (newErrors.username || newErrors.password) {
+    if (newErrors.email || newErrors.password || newErrors.phoneNumber) {
       // console.log("Form submission failed due to errors:");
 
       return;
     }
     console.log("Form submitted:", formData);
 
-    const response = await register(formData.username, formData.password);
+    const response = await register({ ...formData });
 
     console.log("Response from handleRegister:", response);
 
@@ -79,6 +99,7 @@ const RegisterPage = () => {
 
     alert("Success, " + response.data.message);
   };
+
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -96,28 +117,80 @@ const RegisterPage = () => {
             Create New Account
           </h2>
           <form onSubmit={handleSubmit}>
-            {/* Username/Email Field */}
+            {/* Name Field */}
             <div className="mb-5">
               <div
                 className={`flex items-center border ${
-                  errors.username ? "border-red-500" : "border-gray-300"
+                  errors.email ? "border-red-500" : "border-gray-300"
                 } rounded-md px-3 focus-within:border-[#10a395] transition-colors`}
               >
                 <i className="fas fa-user text-gray-400 text-lg"></i>
                 <input
-                  type="email"
+                  type="text"
                   required
-                  name="username"
-                  placeholder="Email"
+                  name="name"
+                  placeholder="Name"
                   className="w-full h-12 pl-3 text-gray-700 focus:outline-none border-none text-sm"
-                  value={formData.username}
+                  value={formData.name}
                   onChange={handleInputChange}
                 />
               </div>
-              {errors.username && (
+              {errors.email && (
                 <p className="text-red-600 text-xs mt-1 flex items-center">
                   <i className="fas fa-exclamation-circle mr-1"></i>
-                  {errors.username}
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Email Field */}
+            <div className="mb-5">
+              <div
+                className={`flex items-center border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-md px-3 focus-within:border-[#10a395] transition-colors`}
+              >
+                <i className="fas fa-envelope text-gray-400 text-lg"></i>
+                <input
+                  type="email"
+                  required
+                  name="email"
+                  placeholder="Email"
+                  className="w-full h-12 pl-3 text-gray-700 focus:outline-none border-none text-sm"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-600 text-xs mt-1 flex items-center">
+                  <i className="fas fa-exclamation-circle mr-1"></i>
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Phone Number */}
+            <div className="mb-6">
+              <div
+                className={`flex items-center border ${
+                  errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                } rounded-md px-3 focus-within:border-[#10a395] transition-colors`}
+              >
+                <i className="fas fa-phone-alt text-gray-400 text-md">(+91)</i>
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  required
+                  placeholder="Phone Number"
+                  className="w-full h-12 pl-3 text-gray-700 focus:outline-none border-none text-sm"
+                  value={formData.phoneNumber}
+                  onChange={handleInputChange}
+                />
+              </div>
+              {errors.phoneNumber && (
+                <p className="text-red-600 text-xs mt-1 flex items-center">
+                  <i className="fas fa-phone-alt mr-1"></i>
+                  {errors.phoneNumber}
                 </p>
               )}
             </div>
@@ -196,7 +269,7 @@ const RegisterPage = () => {
               )}
             </div>
 
-            {/* Login Button */}
+            {/* Register Button */}
             <button
               type="submit"
               disabled={loading}
@@ -211,7 +284,7 @@ const RegisterPage = () => {
               text-[#10a395]
              hover:cursor-pointer hover:underline mt-6 flex gap-1 justify-end w-fit"
                 onClick={() => {
-                  navigate("/login");
+                  navigate("/");
                 }}
               >
                 <ArrowLeftCircle size={20} className="" />
