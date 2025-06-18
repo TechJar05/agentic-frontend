@@ -8,7 +8,8 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [activeRole, setActiveRole] = useState("admin");
   const [showPassword, setShowPassword] = useState(false);
- 
+  const [rememberMe, setRememberMe] = useState(false);
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -231,7 +232,7 @@ const LoginPage = () => {
               text-[#10a395]
              hover:cursor-pointer hover:underline mt-6 flex gap-1 justify-end w-fit"
                 onClick={() => {
-                  navigate("/register");
+                  navigate("/authpage/register");
                 }}
               >
                 <p className="font-medium ">Register Now</p>

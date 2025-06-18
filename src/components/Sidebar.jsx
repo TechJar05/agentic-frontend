@@ -1,13 +1,15 @@
+
 import React from "react";
 import { Link, Navigate, useLocation ,useNavigate} from "react-router-dom";
+
 import agenticLogo from "../assets/agenticLogo.png";
 
 // eslint-disable-next-line no-unused-vars
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const location = useLocation();
-
+  const navigate = useNavigate();
+  // Determine current active path for highlight
   const currentPath = location.pathname;
-   const navigate = useNavigate();
 
  
   const handleLogout = () => {
@@ -56,10 +58,24 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             <Link
               to="/task-logs"
               onClick={() => setActiveTab("tasks")}
+
               className={`flex items-center w-full px-6 py-3 text-left ${
                 currentPath === "/task-logs"
                   ? "bg-teal-600"
                   : "hover:bg-teal-600"
+              } cursor-pointer whitespace-nowrap`}
+            >
+              <i className="fas fa-tasks mr-3"></i>
+              Task Logs
+            </Link>
+          </li>
+
+          <li>
+            <button
+              onClick={() => setActiveTab("profile")}
+              className={`flex items-center w-full px-6 py-3 text-left ${
+                activeTab === "profile" ? "bg-teal-600" : "hover:bg-teal-600"
+
               } cursor-pointer whitespace-nowrap`}
             >
               <i className="fas fa-tasks mr-3"></i>
@@ -80,6 +96,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       </nav>
       <div className="mt-auto p-4 border-t border-teal-600">
         <button
+
           onClick={handleLogout}  // Call handleLogout on click
           className="flex items-center w-full px-4 py-2 text-left text-white bg-teal-500 rounded-lg hover:bg-teal-400 cursor-pointer whitespace-nowrap"
         >

@@ -24,7 +24,6 @@ function App() {
 }
 
 export default App;
-
 // // src/App.js
 // import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Make sure Navigate is imported here
 // import { useState } from 'react';
