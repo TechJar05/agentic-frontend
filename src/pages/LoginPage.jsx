@@ -8,7 +8,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [activeRole, setActiveRole] = useState("admin");
   const [showPassword, setShowPassword] = useState(false);
- 
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -45,6 +45,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    //Validation checks
     const newErrors = {
       username: "",
       password: "",
@@ -63,10 +65,10 @@ const LoginPage = () => {
     if (newErrors.username && newErrors.password) {
       return;
     }
-    // Submit form logic would go here
+    // Submit form logic
     // console.log("Form submitted:", formData);
 
-    const response = await login(formData.username, formData.password);
+    const response = await login({ ...formData, role: activeRole });
 
     if (response.status >= 300) {
       // console.log("Error in handleSubmit");

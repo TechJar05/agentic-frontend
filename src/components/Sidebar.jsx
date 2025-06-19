@@ -27,7 +27,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         <ul>
           <li>
             <Link
-              to="/"
+              to="/md-dashboard"
               onClick={() => setActiveTab("dashboard")}
               className={`flex items-center w-full px-6 py-3 text-left ${
                 currentPath === "/" ? "bg-teal-600" : "hover:bg-teal-600"
