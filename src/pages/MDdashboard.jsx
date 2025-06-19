@@ -108,7 +108,7 @@
 
 // export default MDdashboard;
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Navigation hook
 import { Line } from "react-chartjs-2"; // Chart component
 import useDashboard from "../hooks/useDashboard"; // Import the custom hook to fetch dashboard data
@@ -137,7 +137,31 @@ ChartJS.register(
 
 const MDdashboard = () => {
   const navigate = useNavigate(); // Hook to navigate to other pages
-  const { dashboardData, loading, error } = useDashboard(); // Using the custom hook to fetch dashboard data
+  const { loadDashboardData, loading } = useDashboard(); // Using the custom hook to fetch dashboard data
+
+  const [dashboardData, setDashboardData] = useState({
+    userName: "MD Name",
+    totalEmployees: 10,
+    tasksAssigned: 7,
+    tasksCompleted: 4,
+    tasksInProgress: 3,
+    pendingApprovals: 2,
+  });
+
+  // Fetch the dashboard data when the component mounts
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await loadDashboardData(); // Call the hook to get the dashboard data
+        setDashboardData(response.data.data); // Set the fetched data to state
+      } catch (error) {
+        console.log("Error fetching dashboard data:", error);
+        alert("Failed to fetch dashboard data");
+      }
+    }
+
+    fetchData();
+  }, []);
 
   // Handle the button click to navigate to the Task Logs page
   const handleViewAllTasks = () => {
@@ -145,14 +169,14 @@ const MDdashboard = () => {
   };
 
   if (loading) return <div>Loading...</div>; // Show loading state while data is being fetched
-  if (error) return <div>Error: {error}</div>; // Show error message if data fetching fails
+  // if (error) return <div>Error: {error}</div>; // Show error message if data fetching fails
 
   const chartData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
       {
         label: "Task Completion Rate",
-        data: dashboardData.taskCompletionRate,
+        data: dashboardData.taskCompletionRate || [10, 20, 30, 25, 35, 20, 30],
         fill: true,
         backgroundColor: "rgba(0, 150, 138,0.2)",
         borderColor: "rgba(1, 117, 48,1)",
@@ -179,7 +203,7 @@ const MDdashboard = () => {
     },
     {
       title: "Pending Approval",
-      value: dashboardData.tasksPendingApproval,
+      value: dashboardData.pendingApprovals,
       icon: "fa-clock",
     },
     {

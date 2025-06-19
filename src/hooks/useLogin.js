@@ -4,10 +4,10 @@ import { loginUser } from "../services/loginService";
 export const useLogin = () => {
   const [loading, setLoading] = useState(false);
 
-  const login = async (email, password) => {
+  const login = async ({ email, password, role }) => {
     setLoading(true);
     try {
-      const response = await loginUser(email, password);
+      const response = await loginUser({ email, password, role });
       // console.log("Response from login hook", response);
 
       return response;

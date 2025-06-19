@@ -51,7 +51,8 @@ function App() {
     <Router>
       <Routes>
         {/* Starting Page - LoginPage */}
-        <Route path="/" element={<LoginPage setUser={setUser} />} />{" "}
+        <Route path="/" element={<LoginPage setUser={setUser} />} />
+        <Route path="/register" element={<RegisterPage />} />
         {/* Redirect to login as the starting page */}
         {/* Routes for pages that need the Layout (sidebar and navbar) */}
         {/* Route for Admin Dashboard after login */}
@@ -86,8 +87,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Route>
         {/* Routes for Login and Register pages without Layout */}
-        <Route path="/login" element={<LoginPage setUser={setUser} />} />
-        <Route path="/register" element={<RegisterPage />} />
+        {/* <Route path="/login" element={<LoginPage setUser={setUser} />} /> */}
       </Routes>
     </Router>
   );
