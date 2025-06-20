@@ -1,31 +1,28 @@
-import axios from 'axios';
+// src/services/mdService.js
+import axios from "axios";
 
-// Create an Axios instance with the base URL from environment variables
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // Get the base URL from Vite's env variable
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const API_URL = import.meta.env.VITE_API_URL;
 
-// Function to fetch all MDs
-export const fetchMDs = async () => {
-  try {
-    const response = await api.get('/mds'); // Get list of MDs from the backend
-    return response.data; // Return the list of MDs
-  } catch (error) {
-    console.error('Error fetching MDs:', error);
-    throw error;
-  }
+// Get MD list for an admin
+export const fetchMDs = async (adminId, token) => {
+  const res = await axios.get(`${API_URL}admin/md-list/${adminId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
 };
 
-// Function to update the MD's status (approve or reject)
-export const updateMDStatus = async (id, status) => {
-  try {
-    const response = await api.post(`/mds/${id}/status`, { status });
-    return response.data; // Return the updated MD
-  } catch (error) {
-    console.error('Error updating MD status:', error);
-    throw error;
-  }
+// Reject an MD
+export const rejectMD = async (mdId, token) => {
+  const res = await axios.put(
+    `${API_URL}admin/reject-md/${mdId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
 };

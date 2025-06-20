@@ -65,28 +65,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
               Task Logs
             </Link>
           </li>
-
-          <li>
-            <Link
-              onClick={() => setActiveTab("profile")}
-              className={`flex items-center w-full px-6 py-3 text-left ${
-                activeTab === "profile" ? "bg-teal-600" : "hover:bg-teal-600"
-              } cursor-pointer whitespace-nowrap`}
-            >
-              <i className="fas fa-tasks mr-3"></i>
-              Task Logs
-            </Link>
-          </li>
-
-          <Link
-            to="/profile"
-            className={`flex items-center w-full px-6 py-3 text-left ${
-              currentPath === "/profile" ? "bg-teal-600" : "hover:bg-teal-600"
-            } cursor-pointer whitespace-nowrap`}
-          >
-            <i className="fas fa-user-circle mr-3"></i>
-            Profile
-          </Link>
         </ul>
       </nav>
       <div className="mt-auto p-4 border-t border-teal-600">

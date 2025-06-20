@@ -3,6 +3,8 @@ import agenticLogo from "../assets/agenticLogo.png";
 import { ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const LoginPage = () => {
     username: "",
     password: "",
   });
+
   const [errors, setErrors] = useState({
     username: "",
     password: "",
@@ -30,7 +33,6 @@ const LoginPage = () => {
       ...formData,
       [name]: value,
     });
-    // Clear error when user types
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -44,48 +46,50 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    //Validation checks
-    const newErrors = {
-      username: "",
-      password: "",
-    };
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    }
-    setErrors(newErrors);
-
-    if (newErrors.username && newErrors.password) {
-      return;
-    }
-    // Submit form logic
-    // console.log("Form submitted:", formData);
-
-    const response = await login({ ...formData, role: activeRole });
-
-    if (response.status >= 300) {
-      // console.log("Error in handleSubmit");
-      alert(response.data.message);
-      return;
-    }
-
-    // console.log("From handleSubmit", response);
-    alert("Success");
-    setFormData({
-      username: "",
-      password: "",
-    });
+  e.preventDefault();
+  const newErrors = {
+    username: "",
+    password: "",
   };
+
+  if (!formData.username.trim()) {
+    newErrors.username = "Username is required";
+  }
+  if (!formData.password) {
+    newErrors.password = "Password is required";
+  } else if (formData.password.length < 2) {
+    newErrors.password = "Password must be at least 6 characters";
+  }
+
+  setErrors(newErrors);
+
+  if (newErrors.username || newErrors.password) return;
+
+  const response = await login({
+    email: formData.username,
+    password: formData.password,
+    role: activeRole,
+  });
+
+  if (response.status >= 300) {
+    toast.error(response.data.message || "Login failed");
+    return;
+  }
+
+  toast.success("Login successful!");
+
+  setFormData({ username: "", password: "" });
+
+  // ✅ Navigate after a short delay
+  setTimeout(() => {
+    if (activeRole === "admin") navigate("/admin-dashboard");
+    else if (activeRole === "md") navigate("/md-dashboard");
+  }, 1000);
+};
 
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4">
+      <ToastContainer position="top-center" />
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-8 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
@@ -94,16 +98,14 @@ const LoginPage = () => {
             <p>AGENTIC</p>
           </div>
         </div>
+
         {/* Role Toggle */}
         <div className="flex justify-center mb-8">
           <div className="relative bg-gray-100 rounded-full w-[280px] h-12 flex items-center">
             <div
               className={
                 "absolute top-1 bottom-1 w-[136px] bg-[#10a395] rounded-full transition-all duration-900 ease-in-out " +
-                  activeRole ===
-                "admin"
-                  ? "left-1"
-                  : "left-[142px]"
+                (activeRole === "admin" ? "left-1" : "left-[142px]")
               }
             ></div>
             <button
@@ -126,13 +128,14 @@ const LoginPage = () => {
             </button>
           </div>
         </div>
+
         {/* Form Container */}
         <div className="bg-white rounded-lg shadow-md p-8 w-full">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
             {activeRole === "admin" ? "Admin Login" : "MD Login"}
           </h2>
           <form onSubmit={handleSubmit}>
-            {/* Username/Email Field */}
+            {/* Email */}
             <div className="mb-5">
               <div
                 className={`flex items-center border ${
@@ -142,8 +145,8 @@ const LoginPage = () => {
                 <i className="fas fa-user text-gray-400 text-lg"></i>
                 <input
                   type="email"
-                  required={true}
                   name="username"
+                  required
                   placeholder="Email"
                   className="w-full h-12 pl-3 text-gray-700 focus:outline-none border-none text-sm"
                   value={formData.username}
@@ -157,7 +160,8 @@ const LoginPage = () => {
                 </p>
               )}
             </div>
-            {/* Password Field */}
+
+            {/* Password */}
             <div className="mb-6">
               <div
                 className={`flex items-center border ${
@@ -193,31 +197,7 @@ const LoginPage = () => {
                 </p>
               )}
             </div>
-            {/* Remember Me and Forgot Password */}
-            <div className="flex items-center justify-end mb-6">
-              {/*<div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="w-4 h-4 text-[#10a395] border-gray-300 rounded focus:ring-[#10a395]"
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                />
-                <label
-                  htmlFor="remember"
-                  className="ml-2 text-sm text-gray-600 cursor-pointer"
-                >
-                  Remember Me
-                </label>
-              </div>
-              <a
-                href="#"
-                className="text-sm text-[#10a395] hover:underline cursor-pointer"
-              >
-                Forgot Password?
-              </a>
-              */}
-            </div>
+
             {/* Login Button */}
             <button
               type="submit"
@@ -229,25 +209,18 @@ const LoginPage = () => {
 
             <div className="flex justify-end">
               <div
-                className="text-sm hover:text-[#0d8a7e]
-              text-[#10a395]
-             hover:cursor-pointer hover:underline mt-6 flex gap-1 justify-end w-fit"
-                onClick={() => {
-                  navigate("/register");
-                }}
+                className="text-sm hover:text-[#0d8a7e] text-[#10a395] hover:cursor-pointer hover:underline mt-6 flex gap-1 justify-end w-fit"
+                onClick={() => navigate("/register")}
               >
-                <p className="font-medium ">Register Now</p>
-                <ArrowRightCircle size={20} className="" />
+                <p className="font-medium">Register Now</p>
+                <ArrowRightCircle size={20} />
               </div>
             </div>
           </form>
-        </div>
-        {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          {/* <p>© {new Date().getFullYear()} AGENTIC. All rights reserved.</p> */}
         </div>
       </div>
     </div>
   );
 };
+
 export default LoginPage;

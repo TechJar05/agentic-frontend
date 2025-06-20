@@ -1,31 +1,52 @@
 // src/services/employeeService.js
-import axios from 'axios';
+import axios from "axios";
 
-// Get the API URL from the environment variables using import.meta.env
 const API_URL = import.meta.env.VITE_API_URL;
 
-// Create an axios instance
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Fetch employees from the backend
-export const getEmployees = async () => {
-  const response = await apiClient.get('/employees');
-  return response.data;
+// Get employees
+export const getEmployees = async (mdId, token) => {
+  const res = await axios.get(`${API_URL}md/employee-list/${mdId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
 };
 
-// Add a new employee
-export const addEmployee = async (employeeData) => {
-  const response = await apiClient.post('/employees', employeeData);
-  return response.data;
+// Add new employee
+export const addEmployee = async (employeeData, token) => {
+  const payload = {
+    ...employeeData,
+    phone_number: `91${employeeData.phone_number}`,
+  };
+
+  const res = await axios.post(`${API_URL}md/create-employee`, payload, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.data;
 };
 
-// Update an employee's phone number
-export const updateEmployeePhone = async (employeeId, newPhone) => {
-  const response = await apiClient.put(`/employees/${employeeId}`, { phone: newPhone });
-  return response.data;
+// Update phone number
+export const updateEmployeePhone = async (employeeId, phone, token) => {
+  const res = await axios.put(
+    `${API_URL}md/update-employee-phone/${employeeId}`,
+    { phone_number: phone },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return res.data;
+};
+
+// Delete employee
+export const deleteEmployee = async (employeeId, token) => {
+  return await axios.delete(`${API_URL}md/delete-employee/${employeeId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 };

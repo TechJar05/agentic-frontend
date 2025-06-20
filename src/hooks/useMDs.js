@@ -1,36 +1,41 @@
-import { useState, useEffect } from 'react';
-import { fetchMDs, updateMDStatus } from '../services/mdService'; // Import service functions
+import { useState, useEffect } from "react";
+import { fetchMDs, rejectMD } from "../services/mdService";
+import { useAuth } from "../context/authContext";
 
-const useMDs = () => {
+const useMDs = (adminId) => {
+  const { user } = useAuth(); // 🔐 Grab token from context
+  const token = user?.token;
+
   const [mds, setMds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch MDs list on component mount
   useEffect(() => {
     const getMDs = async () => {
       try {
-        const data = await fetchMDs(); // Fetch MDs using the service
+        const data = await fetchMDs(adminId, token);
+        console.log("Fetching MDs with:", { adminId, token }); // Pass token
         setMds(data);
         setLoading(false);
-      } catch  {
-        setError('Failed to fetch MDs');
+      } catch {
+        setError("Failed to fetch MDs");
         setLoading(false);
       }
     };
 
-    getMDs();
-  }, []);
+    if (adminId && token) getMDs();
+  }, [adminId, token]);
 
-  // Update MD status (approve/reject)
   const changeMDStatus = async (id, status) => {
     try {
-      const updatedMD = await updateMDStatus(id, status);
-      setMds((prevMds) =>
-        prevMds.map((md) => (md.id === id ? { ...md, status: updatedMD.status } : md))
+      if (status === "rejected") {
+        await rejectMD(id, token); // Pass token
+      }
+      setMds((prev) =>
+        prev.map((md) => (md.id === id ? { ...md, status } : md))
       );
-    } catch  {
-      setError('Failed to update MD status');
+    } catch {
+      setError("Failed to update MD status");
     }
   };
 
