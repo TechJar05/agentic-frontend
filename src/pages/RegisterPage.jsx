@@ -364,9 +364,9 @@ const RegisterPage = () => {
 
     const response = await register(formData);
     if (response.status >= 300) {
-      toast.error("Registration failed: " + response.data.message);
+      toast.error(response.data.message || "Registration failed");
       return;
-    }
+}
 
     toast.success("OTP sent to your email");
     setStep("otp");
@@ -384,17 +384,17 @@ const RegisterPage = () => {
 
   const otpVerifyResponse = await verifyOtp(formData.email, otp);
   if (otpVerifyResponse.status >= 300) {
-    toast.error("OTP verification failed: " + otpVerifyResponse.data.message);
-    return;
-  }
+      toast.error(otpVerifyResponse?.response?.data?.message || "OTP verification failed.");
+      return;
+}
 
   toast.success("Successfully registered!");
   setTimeout(() => navigate("/"), 1500);
 };
   return (
-    <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <ToastContainer />
-      <div className="w-full max-w-md">
+       <div className="w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
         <div className="flex justify-center mb-8 mt-4 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
           <img src={agenticLogo} alt="Agentic Logo" className="w-14 h-14" />
           <div className="text-3xl flex items-center font-bold text-gray-800">

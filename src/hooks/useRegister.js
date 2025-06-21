@@ -37,9 +37,13 @@ export const useRegister = () => {
   const register = async ({ name, email, password, phoneNumber }) => {
     setLoading(true);
     try {
-      return await registerUser({ name, email, password, phoneNumber });
+      const res = await registerUser({ name, email, password, phoneNumber });
+      return { status: res.status, data: res.data };
     } catch (error) {
-      return error;
+      return {
+        status: error?.response?.status || 500,
+        data: error?.response?.data || { message: "Registration failed. Please try again." },
+      };
     } finally {
       setLoading(false);
     }
@@ -48,9 +52,13 @@ export const useRegister = () => {
   const verifyOtp = async (email, otp) => {
     setLoading(true);
     try {
-      return await verifyEmailOtp(email, otp);
+      const res = await verifyEmailOtp(email, otp);
+      return { status: res.status, data: res.data };
     } catch (error) {
-      return error;
+      return {
+        status: error?.response?.status || 500,
+        data: error?.response?.data || { message: "OTP verification failed. Try again." },
+      };
     } finally {
       setLoading(false);
     }

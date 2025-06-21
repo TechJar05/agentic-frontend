@@ -46,24 +46,32 @@ export const useLogin = () => {
   const loginHandler = async ({ email, password, role }) => {
     try {
       setLoading(true);
-      localStorage.removeItem("user"); // Clear previous user data
-      localStorage.removeItem("token"); // Clear previous token
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+
       const response = await loginUser({ email, password, role });
       console.log("Backend response:", response.data);
-      const { tokens, user } = response.data;
-      console.log("Tokens:", tokens, "User:", user);
+
+      // eslint-disable-next-line no-unused-vars
+      const { access_token, refresh_token, id, name, role: userRole } = response.data;
+
       login({
-        token: tokens.access,
+        token: access_token,
         user: {
-          ...user,
-          id: user.id || user.userId, // Handle potential userId field
-          token: tokens.access,
+          id,
+          name,
+          role: userRole,
+          token: access_token,
         },
       });
-      return response;
+
+      return { status: 200, data: response.data };
     } catch (error) {
-      console.error("Login error:", error.response?.data);
-      return error;
+      console.error("Login error:", error?.response?.data);
+      return {
+        status: error?.response?.status || 500,
+        data: error?.response?.data || { message: "Login failed" },
+      };
     } finally {
       setLoading(false);
     }
@@ -71,4 +79,3 @@ export const useLogin = () => {
 
   return { login: loginHandler, loading };
 };
-export default useLogin;
