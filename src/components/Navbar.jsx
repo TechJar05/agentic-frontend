@@ -77,7 +77,7 @@ const Navbar = () => {
 
   return (
     <nav className="flex items-center justify-between px-6 py-3 bg-white shadow">
-      <h1 className="text-xl font-semibold">Welcome {mdName}</h1>
+      <h1 className="text-xl font-semibold">Welcome, {mdName}</h1>
 
       <div className="relative ">
         <button onClick={() => setDropdownOpen(!dropdownOpen)}>

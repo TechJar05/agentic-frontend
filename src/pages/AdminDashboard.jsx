@@ -255,7 +255,6 @@
 
 // export default AdminDashboard;
 
-
 import React, { useState } from "react";
 import useMDs from "../hooks/useMDs";
 import { ToastContainer } from "react-toastify";
@@ -270,7 +269,7 @@ const AdminDashboard = () => {
   // console.log("Auth user:", user);
   // console.log("Token:", token);
 
-  const { mds, loading, handleReject } = useMDs(user?.id, token);
+  const { mds, loading, handleReject,handleApprove } = useMDs(user?.id, token);
 
   const filteredMDs = mds.filter((md) => {
     const matchesStatus =
@@ -284,7 +283,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-4 md:px-8">
       <ToastContainer />
-      
+
       <header className="bg-white shadow-sm mb-6 p-4 rounded">
         <h1 className="text-2xl font-bold text-gray-900">
           MD Approval Dashboard
@@ -337,14 +336,24 @@ const AdminDashboard = () => {
                   <td className="px-4 py-2 capitalize">{md.approvalStatus}</td>
                   <td className="px-4 py-2">
                     {md.approvalStatus === "pending" ? (
-                      <button
-                        onClick={() => handleReject(md.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
-                      >
-                        Reject
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprove(md.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(md.id)}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+                        >
+                          Reject
+                        </button>
+                      </div>
                     ) : (
-                      <span className="text-gray-500">—</span>
+                      <span className="text-gray-500 capitalize">
+                        {md.approvalStatus}
+                      </span>
                     )}
                   </td>
                 </tr>

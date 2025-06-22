@@ -7,6 +7,7 @@ import {
   deleteEmployee,
 } from "../services/employeeService";
 import { useAuth } from "../context/authContext";
+import { toast } from "react-toastify";
 
 const useEmployees = (mdId) => {
   const { token } = useAuth();
@@ -14,11 +15,14 @@ const useEmployees = (mdId) => {
   const [loading, setLoading] = useState(true);
 
   const fetchEmployees = async () => {
+    setLoading(true);
     try {
-      const data = await getEmployees(mdId, token);
-      setEmployees(data);
+      // const data = await getEmployees(mdId, token);
+      const employeeList = await getEmployees(mdId, token);
+      setEmployees(employeeList);
     } catch (error) {
       console.error("Error fetching employees:", error);
+      toast.error("Failed to load employees");
     } finally {
       setLoading(false);
     }
@@ -32,30 +36,34 @@ const useEmployees = (mdId) => {
 
   const handleAddEmployee = async (employeeData) => {
     try {
-      const addedEmployee = await addEmployee(employeeData, token);
-      setEmployees((prev) => [...prev, addedEmployee]);
+      await addEmployee(employeeData, token); // no need to store the result
+      toast.success("Employee added successfully");
+      await fetchEmployees(); // update the list
     } catch (error) {
       console.error("Error adding employee:", error);
+      toast.error("Failed to add employee");
     }
   };
 
   const handleUpdatePhone = async (employeeId, newPhone) => {
     try {
-      const updatedEmployee = await updateEmployeePhone(employeeId, newPhone, token);
-      setEmployees((prev) =>
-        prev.map((emp) => (emp.id === updatedEmployee.id ? updatedEmployee : emp))
-      );
+      await updateEmployeePhone(employeeId, newPhone, token);
+      toast.success("Phone number updated");
+      await fetchEmployees(); // refetch to update UI
     } catch (error) {
       console.error("Error updating phone:", error);
+      toast.error("Failed to update phone number");
     }
   };
 
   const handleDeleteEmployee = async (employeeId) => {
     try {
       await deleteEmployee(employeeId, token);
-      setEmployees((prev) => prev.filter((emp) => emp.id !== employeeId));
+      toast.success("Employee deleted");
+      await fetchEmployees(); // refetch to update UI
     } catch (error) {
       console.error("Error deleting employee:", error);
+      toast.error("Failed to delete employee");
     }
   };
 

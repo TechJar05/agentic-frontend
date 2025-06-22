@@ -103,7 +103,13 @@ const useMDs = (adminId, token) => {
     }
   }, [adminId, token]);
 
-  return { mds, loading, error, changeMDStatus };
+  return {
+  mds,
+  loading,
+  error,
+  handleReject: (id) => changeMDStatus(id, "rejected"),
+  handleApprove: (id) => changeMDStatus(id, "approved"),
+};
 };
 
 export default useMDs;

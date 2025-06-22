@@ -1,6 +1,8 @@
+// ManageEmployee.jsx
 import React, { useEffect, useState } from "react";
 import useEmployees from "../hooks/useEmployees";
 import { useAuth } from "../context/authContext";
+import { toast } from "react-toastify";
 
 const ManageEmployee = () => {
   const { user } = useAuth();
@@ -12,9 +14,8 @@ const ManageEmployee = () => {
     handleAddEmployee,
     handleUpdatePhone,
     handleDeleteEmployee,
-    // eslint-disable-next-line no-unused-vars
     refetchEmployees,
-  } = useEmployees(mdId); // custom hook now takes MD ID
+  } = useEmployees(mdId);
 
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [showUpdatePhoneModal, setShowUpdatePhoneModal] = useState(false);
@@ -30,15 +31,17 @@ const ManageEmployee = () => {
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
   useEffect(() => {
-    const filtered = employees.filter((emp) =>
-      emp.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredEmployees(filtered);
+    if (Array.isArray(employees)) {
+      const filtered = employees.filter((emp) =>
+        emp.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredEmployees(filtered);
+    }
   }, [searchQuery, employees]);
 
   const handleNewEmployeeChange = (e) => {
     const { name, value } = e.target;
-    if (name === "phoneNumber" && (!/^\d{0,10}$/.test(value))) return;
+    if (name === "phoneNumber" && !/^\d{0,10}$/.test(value)) return;
     setNewEmployee((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -52,17 +55,23 @@ const ManageEmployee = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (newEmployee.phoneNumber.length !== 10) {
-      alert("Phone number must be exactly 10 digits");
+      toast.error("Phone number must be exactly 10 digits");
       return;
     }
+   if (parseInt(newEmployee.taskCapacity) <= 0) {
+  toast.error("Task capacity must be greater than 0");
+  return;
+}
 
     const payload = {
-      ...newEmployee,
-      phone_number: `91${newEmployee.phoneNumber}`,
-      md_id: mdId,
+      employeeName: newEmployee.name,
+      phoneNumber: `91${newEmployee.phoneNumber}`,
+      maxTaskCapacity: newEmployee.taskCapacity,
+      department: newEmployee.department,
     };
 
     await handleAddEmployee(payload);
+    await refetchEmployees();
     setShowAddEmployeeModal(false);
     setNewEmployee({ name: "", phoneNumber: "", taskCapacity: "", department: "" });
   };
@@ -70,10 +79,11 @@ const ManageEmployee = () => {
   const handleUpdatePhoneSubmit = async (e) => {
     e.preventDefault();
     if (phoneNumber.length !== 10) {
-      alert("Phone number must be exactly 10 digits");
+      toast.error("Phone number must be exactly 10 digits");
       return;
     }
     await handleUpdatePhone(selectedEmployee.id, `91${phoneNumber}`);
+    await refetchEmployees();
     setShowUpdatePhoneModal(false);
   };
 
@@ -85,7 +95,6 @@ const ManageEmployee = () => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm">
-      {/* Top Bar */}
       <div className="p-6 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-xl font-semibold">Employee Management</h3>
         <button
@@ -96,7 +105,6 @@ const ManageEmployee = () => {
         </button>
       </div>
 
-      {/* Search */}
       <div className="p-6 border-b border-gray-200">
         <input
           type="text"
@@ -107,7 +115,6 @@ const ManageEmployee = () => {
         />
       </div>
 
-      {/* Employee Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -121,25 +128,30 @@ const ManageEmployee = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredEmployees.map((emp) => (
               <tr key={emp.id}>
-                <td className="px-6 py-4">{emp.name}</td>
-                <td className="px-6 py-4">{emp.phone_number}</td>
+                <td className="px-6 py-4">{emp.employeeName}</td>
+                <td className="px-6 py-4">{emp.phoneNumber}</td>
                 <td className="px-6 py-4">
                   <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                    emp.status === "Active" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"
+                    emp.employeeStatus === "active"
+                      ? "bg-green-200 text-green-700"
+                      : "bg-red-200 text-red-700"
                   }`}>
-                    {emp.status}
+                    {emp.employeeStatus}
                   </span>
                 </td>
                 <td className="px-6 py-4 flex gap-2">
                   <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
                     onClick={() => openUpdatePhoneModal(emp)}
                   >
                     Update Phone
                   </button>
                   <button
-                    className="bg-red-600 text-white px-3 py-1 rounded"
-                    onClick={() => handleDeleteEmployee(emp.id)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded"
+                    onClick={() => {
+                      handleDeleteEmployee(emp.id);
+                      refetchEmployees();
+                    }}
                   >
                     Delete
                   </button>
@@ -155,43 +167,50 @@ const ManageEmployee = () => {
         </table>
       </div>
 
-      {/* Add Employee Modal */}
       {showAddEmployeeModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 w-96 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Add Employee</h2>
-            <form onSubmit={handleFormSubmit}>
-              <input type="text" name="name" placeholder="Name" required value={newEmployee.name} onChange={handleNewEmployeeChange} className="mb-2 w-full p-2 border rounded" />
-              <input type="text" name="phoneNumber" placeholder="Phone (10 digits)" required value={newEmployee.phoneNumber} onChange={handleNewEmployeeChange} className="mb-2 w-full p-2 border rounded" />
-              <input type="number" name="taskCapacity" placeholder="Task Capacity" required value={newEmployee.taskCapacity} onChange={handleNewEmployeeChange} className="mb-2 w-full p-2 border rounded" />
-              <input type="text" name="department" placeholder="Department" required value={newEmployee.department} onChange={handleNewEmployeeChange} className="mb-2 w-full p-2 border rounded" />
-              <div className="flex justify-between mt-3">
-                <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowAddEmployeeModal(false)}>Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-[#00968a] text-white rounded">Add</button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 w-full max-w-md rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-center">Add Employee</h2>
+            <form onSubmit={handleFormSubmit} className="space-y-3">
+              <input type="text" name="name" placeholder="Name" required value={newEmployee.name} onChange={handleNewEmployeeChange} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#00968a]" />
+              <input type="text" name="phoneNumber" placeholder="Phone (10 digits)" required value={newEmployee.phoneNumber} onChange={handleNewEmployeeChange} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#00968a]" />
+              <input
+                type="number"
+                name="taskCapacity"
+                placeholder="Task Capacity"
+                required
+                min="0" // 👈 prevents negative numbers
+                value={newEmployee.taskCapacity}
+                onChange={handleNewEmployeeChange}
+                className="mb-2 w-full p-2 border rounded"
+              />
+              <input type="text" name="department" placeholder="Department" required value={newEmployee.department} onChange={handleNewEmployeeChange} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#00968a]" />
+              <div className="flex justify-between pt-4">
+                <button type="button" className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded" onClick={() => setShowAddEmployeeModal(false)}>Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-[#00968a] text-white hover:bg-[#007870] rounded">Add</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Update Phone Modal */}
       {showUpdatePhoneModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 w-96 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Update Phone</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 w-full max-w-md rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4 text-center">Update Phone</h2>
             <form onSubmit={handleUpdatePhoneSubmit}>
               <input
                 type="text"
                 value={phoneNumber}
                 onChange={handlePhoneChange}
                 placeholder="Enter new phone (10 digits)"
-                className="mb-4 w-full p-2 border rounded"
+                className="mb-4 w-full p-2 border border-gray-300 rounded"
                 maxLength="10"
                 required
               />
               <div className="flex justify-between">
-                <button type="button" className="px-4 py-2 bg-gray-300 rounded" onClick={() => setShowUpdatePhoneModal(false)}>Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
+                <button type="button" className="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded" onClick={() => setShowUpdatePhoneModal(false)}>Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">Update</button>
               </div>
             </form>
           </div>
