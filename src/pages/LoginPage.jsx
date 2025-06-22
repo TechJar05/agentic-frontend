@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import agenticLogo from "../assets/agenticLogo.png";
 import { ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,9 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [activeRole, setActiveRole] = useState("admin");
   const [showPassword, setShowPassword] = useState(false);
+
+  const usernameRef = useRef(null);
+  const passwordRef = useRef(null);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -46,52 +49,67 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const newErrors = {
-    username: "",
-    password: "",
+    e.preventDefault();
+    const newErrors = { username: "", password: "" };
+
+    if (!formData.username.trim()) {
+      newErrors.username = "Username is required";
+    }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+
+    if (newErrors.username) {
+      usernameRef.current?.focus();
+      return;
+    }
+    if (newErrors.password) {
+      passwordRef.current?.focus();
+      return;
+    }
+
+    const response = await login({
+      email: formData.username,
+      password: formData.password,
+      role: activeRole,
+    });
+
+    if (response.status >= 400) {
+      let msg = response.data.message || "Login failed";
+
+      // 🔁 Custom message override
+      if (response.status === 401 || response.status === 404) {
+        msg = "Invalid credentials";
+      }
+
+      toast.error(msg);
+
+      if (msg.toLowerCase().includes("email")) {
+        usernameRef.current?.focus();
+      } else if (msg.toLowerCase().includes("password")) {
+        passwordRef.current?.focus();
+      }
+
+      return;
+    }
+
+    toast.success("Login successful!");
+    setFormData({ username: "", password: "" });
+
+    setTimeout(() => {
+      if (activeRole === "admin") navigate("/admin-dashboard");
+      else if (activeRole === "md") navigate("/md-dashboard");
+    }, 1000);
   };
-
-  if (!formData.username.trim()) {
-    newErrors.username = "Username is required";
-  }
-  if (!formData.password) {
-    newErrors.password = "Password is required";
-  } else if (formData.password.length < 2) {
-    newErrors.password = "Password must be at least 6 characters";
-  }
-
-  setErrors(newErrors);
-
-  if (newErrors.username || newErrors.password) return;
-
-  const response = await login({
-    email: formData.username,
-    password: formData.password,
-    role: activeRole,
-  });
-
-  if (response.status >= 300) {
-    toast.error(response.data.message || "Login failed");
-    return;
-  }
-
-  toast.success("Login successful!");
-
-  setFormData({ username: "", password: "" });
-
-  // ✅ Navigate after a short delay
-  setTimeout(() => {
-    if (activeRole === "admin") navigate("/admin-dashboard");
-    else if (activeRole === "md") navigate("/md-dashboard");
-  }, 1000);
-};
 
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4">
       <ToastContainer position="top-center" />
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="flex justify-center mb-8 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
           <img src={agenticLogo} alt="Agentic Logo" className="w-14 h-14" />
           <div className="text-3xl flex items-center font-bold text-gray-800 ">
@@ -99,7 +117,6 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Role Toggle */}
         <div className="flex justify-center mb-8">
           <div className="relative bg-gray-100 rounded-full w-[280px] h-12 flex items-center">
             <div
@@ -129,7 +146,6 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Form Container */}
         <div className="bg-white rounded-lg shadow-md p-8 w-full">
           <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
             {activeRole === "admin" ? "Admin Login" : "MD Login"}
@@ -146,6 +162,7 @@ const LoginPage = () => {
                 <input
                   type="email"
                   name="username"
+                  ref={usernameRef}
                   required
                   placeholder="Email"
                   className="w-full h-12 pl-3 text-gray-700 focus:outline-none border-none text-sm"
@@ -172,6 +189,7 @@ const LoginPage = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
+                  ref={passwordRef}
                   required
                   placeholder="Password"
                   className="w-full h-12 pl-3 text-gray-700 focus:outline-none border-none text-sm"
@@ -198,7 +216,6 @@ const LoginPage = () => {
               )}
             </div>
 
-            {/* Login Button */}
             <button
               type="submit"
               disabled={loading}

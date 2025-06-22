@@ -46,32 +46,25 @@ export const useLogin = () => {
   const loginHandler = async ({ email, password, role }) => {
     try {
       setLoading(true);
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
 
       const response = await loginUser({ email, password, role });
-      console.log("Backend response:", response.data);
 
-      // eslint-disable-next-line no-unused-vars
-      const { access_token, refresh_token, id, name, role: userRole } = response.data;
+      const { access_token, id, name, role: userRole } = response.data;
+
+      if (!access_token) {
+        return { status: 401, data: { message: "Invalid credentials" } };
+      }
 
       login({
         token: access_token,
-        user: {
-          id,
-          name,
-          role: userRole,
-          token: access_token,
-        },
+        user: { id, name, role: userRole, token: access_token },
       });
 
       return { status: 200, data: response.data };
     } catch (error) {
-      console.error("Login error:", error?.response?.data);
-      return {
-        status: error?.response?.status || 500,
-        data: error?.response?.data || { message: "Login failed" },
-      };
+      const status = error?.response?.status || 500;
+      const message = error?.response?.data?.message || "Login failed";
+      return { status, data: { message } };
     } finally {
       setLoading(false);
     }
@@ -79,3 +72,4 @@ export const useLogin = () => {
 
   return { login: loginHandler, loading };
 };
+export default useLogin;
