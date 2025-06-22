@@ -1,11 +1,12 @@
-// src/hooks/useTaskLogs.js
 import { useState, useEffect } from 'react';
 import taskService from '../services/taskService';
 import { useAuth } from '../context/authContext';
 
 const useTaskLogs = () => {
   const { user } = useAuth();
-  const mdId = user?.id; // dynamically get MD id
+  const mdId = user?.id;
+  const token = user?.token;
+
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,9 +19,9 @@ const useTaskLogs = () => {
   useEffect(() => {
     const fetchTasksData = async () => {
       try {
-        if (!mdId) return;
-        const data = await taskService.fetchTasks(mdId);
-        setTasks(data);
+        if (!mdId || !token) return;
+        const data = await taskService.fetchTasks(mdId, token);
+        setTasks(data?.taskLogs || []);
       } catch {
         setError('Failed to load tasks');
       } finally {
@@ -29,7 +30,7 @@ const useTaskLogs = () => {
     };
 
     fetchTasksData();
-  }, [mdId]);
+  }, [mdId, token]);
 
   return {
     tasks,

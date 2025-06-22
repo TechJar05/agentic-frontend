@@ -176,9 +176,8 @@
 
 // export default TaskLogs;
 
-
-import React from 'react';
-import useTaskLogs from '../hooks/useTaskLogs'; // Use the custom hook
+import React from "react";
+import useTaskLogs from "../hooks/useTaskLogs";
 
 const TaskLogs = () => {
   const {
@@ -193,22 +192,29 @@ const TaskLogs = () => {
     setPriorityFilter,
     approvalFilter,
     setApprovalFilter,
-  } = useTaskLogs(); // Using the custom hook for managing tasks
+  } = useTaskLogs();
 
   const filteredTasks = tasks.filter((task) => {
-    const matchesQuery = task.assignedTo.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || task.status.toLowerCase().replace(' ', '') === statusFilter;
-    const matchesPriority = priorityFilter === 'all' || task.priority.toLowerCase() === priorityFilter;
+    const matchesQuery = task.assignedTo
+      ?.toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" ||
+      task.status?.toLowerCase().replace(" ", "") === statusFilter;
+    const matchesPriority =
+      priorityFilter === "all" ||
+      task.priority?.toLowerCase() === priorityFilter;
     const matchesApproval =
-      approvalFilter === 'all' ||
-      (approvalFilter === 'pending' && task.pendingApproval) ||
-      (approvalFilter === 'approved' && !task.pendingApproval);
+      approvalFilter === "all" ||
+      (approvalFilter === "pending" && task.pendingApproval) ||
+      (approvalFilter === "approved" && !task.pendingApproval);
 
     return matchesQuery && matchesStatus && matchesPriority && matchesApproval;
   });
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="text-center py-6">Loading...</div>;
+  if (error)
+    return <div className="text-red-500 text-center py-6">Error: {error}</div>;
 
   return (
     <div className="bg-white rounded-xl shadow-sm">
@@ -216,19 +222,24 @@ const TaskLogs = () => {
         <h3 className="text-xl font-semibold mb-4">Task Logs</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search Employee</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Search Employee
+            </label>
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search by employee name..."
                 className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Filter by Status
+            </label>
             <select
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               value={statusFilter}
@@ -241,7 +252,9 @@ const TaskLogs = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Priority</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Filter by Priority
+            </label>
             <select
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               value={priorityFilter}
@@ -254,7 +267,9 @@ const TaskLogs = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Pending Approval</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Filter by Pending Approval
+            </label>
             <select
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               value={approvalFilter}
@@ -265,6 +280,19 @@ const TaskLogs = () => {
               <option value="approved">Approved</option>
             </select>
           </div>
+          <div className="flex justify-end mt-4">
+            <button
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"
+              onClick={() => {
+                setSearchQuery("");
+                setStatusFilter("all");
+                setPriorityFilter("all");
+                setApprovalFilter("all");
+              }}
+            >
+              Reset Filters
+            </button>
+          </div>
         </div>
       </div>
 
@@ -272,67 +300,96 @@ const TaskLogs = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {['Task ID', 'Description', 'Department', 'Assigned To', 'Status', 'Priority', 'Deadline', 'Created At', 'Pending Approval'].map((head, idx) => (
-                <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider overflow-hidden">{head}</th>
+              {[
+                "Task ID",
+                "Description",
+                "Department",
+                "Assigned To",
+                "Status",
+                "Priority",
+                "Deadline",
+                "Created At",
+                "Pending Approval",
+              ].map((head, idx) => (
+                <th
+                  key={idx}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider overflow-hidden"
+                >
+                  {head}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredTasks.map((task) => (
               <tr key={task.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{task.id}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{task.description}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {task.id}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.description}
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-500">{task.dept}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{task.assignedTo}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.assignedTo}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    task.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                    task.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
+                      task.status === "Completed"
+                        ? "bg-green-100 text-green-800"
+                        : task.status === "In Progress"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
                     {task.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    task.priority === 'High' ? 'bg-red-100 text-red-800' :
-                    task.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'
-                  }`}>
+                  <span
+                    className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
+                      task.priority === "High"
+                        ? "bg-red-100 text-red-800"
+                        : task.priority === "Medium"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
                     {task.priority}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-500">{task.deadline}</td>
-                <td className="px-6 py-4 text-sm text-gray-500">{task.createdAt}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.deadline}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.createdAt}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    task.pendingApproval ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                  }`}>
-                    {task.pendingApproval ? 'Pending' : 'Approved'}
+                  <span
+                    className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
+                      task.pendingApproval
+                        ? "bg-yellow-100 text-yellow-800"
+                        : "bg-green-100 text-green-800"
+                    }`}
+                  >
+                    {task.pendingApproval ? "Pending" : "Approved"}
                   </span>
                 </td>
               </tr>
             ))}
+            {!filteredTasks.length && (
+              <tr>
+                <td colSpan="9" className="text-center py-6 text-gray-500">
+                  No tasks found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
-
-      {/* <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-        <div className="text-sm text-gray-500">
-          Showing <span className="font-medium">1</span> to{' '}
-          <span className="font-medium">{filteredTasks.length}</span> of{' '}
-          <span className="font-medium">{filteredTasks.length}</span> tasks
-        </div>
-        <div className="flex space-x-2">
-          <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 cursor-pointer !rounded-button whitespace-nowrap">
-            Previous
-          </button>
-          <button className="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 cursor-pointer !rounded-button whitespace-nowrap">
-            Next
-          </button>
-        </div>
-      </div> */}
     </div>
   );
 };
 
 export default TaskLogs;
-

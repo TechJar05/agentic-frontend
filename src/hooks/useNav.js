@@ -6,7 +6,6 @@ export const useNav = () => {
   const { token, user } = useAuth();
   const [mdName, setMdName] = useState(user?.name || "");
   const [loading, setLoading] = useState(false);
-  const [updateStatus, setUpdateStatus] = useState(null);
 
   useEffect(() => {
     const loadMD = async () => {
@@ -18,7 +17,6 @@ export const useNav = () => {
       }
     };
 
-    // optional: call only if mdName is not already from context
     if (!user?.name) {
       loadMD();
     }
@@ -26,19 +24,18 @@ export const useNav = () => {
 
   const updatePhone = async (phoneNumber) => {
     setLoading(true);
-    setUpdateStatus(null);
     try {
       const res = await updatePhoneNumber(phoneNumber, token);
-      setUpdateStatus({ success: true, message: res.data.message });
+      return { success: true, message: res.data.message };
     } catch (err) {
-      setUpdateStatus({
+      return {
         success: false,
         message: err?.response?.data?.message || "Failed to update",
-      });
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  return { mdName, loading, updateStatus, updatePhone };
+  return { mdName, loading, updatePhone };
 };

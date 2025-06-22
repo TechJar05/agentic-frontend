@@ -42,12 +42,25 @@ import TaskLogs from "./pages/TaskLogs";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function App() {
   const [user, setUser] = useState(null); // Replace this with your actual authentication logic
 
   return (
     <Router>
+    <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+
       <Routes>
         {/* Starting Page - LoginPage */}
         <Route path="/" element={<LoginPage setUser={setUser} />} />

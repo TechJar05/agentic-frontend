@@ -52,9 +52,11 @@
 
 import React, { useState } from "react";
 import { useNav } from "../hooks/useNav";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Navbar = () => {
-  const { mdName, updatePhone, updateStatus, loading } = useNav();
+  const { mdName, updatePhone,loading } = useNav();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [phone, setPhone] = useState("");
@@ -72,70 +74,77 @@ const Navbar = () => {
       setPhoneError("Phone number must be exactly 10 digits");
       return;
     }
-    await updatePhone(phone);
+    const res = await updatePhone(phone);
+    if (res?.success) {
+      toast.success(res.message);
+      setShowCard(false);
+      setPhone("");
+    } else {
+      toast.error(res?.message || "Something went wrong");
+    }
   };
 
   return (
-    <nav className="flex items-center justify-between px-6 py-3 bg-white shadow">
-      <h1 className="text-xl font-semibold">Welcome, {mdName}</h1>
+    <>
+      <nav className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-6 py-3 bg-white shadow gap-2 sm:gap-0">
+        <h1 className="text-lg sm:text-xl font-semibold text-center sm:text-left">
+          Welcome, {mdName}
+        </h1>
 
-      <div className="relative ">
-        <button onClick={() => setDropdownOpen(!dropdownOpen)}>
-          <div className="w-10 h-10 rounded-full bg-[#00968a] flex items-center justify-center text-white">
+        <div className="relative self-end sm:self-auto">
+          <button onClick={() => setDropdownOpen(!dropdownOpen)}>
+            <div className="w-10 h-10 rounded-full bg-[#00968a] flex items-center justify-center text-white">
               <i className="fas fa-user"></i>
-          </div>
-        </button>
+            </div>
+          </button>
 
-        {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg z-20">
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-20">
+              <button
+                onClick={() => {
+                  setShowCard(true);
+                  setDropdownOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+              >
+                Update Your Phone Number
+              </button>
+            </div>
+          )}
+        </div>
+
+        {showCard && (
+          <div className="absolute top-16 right-6 w-80 bg-white shadow-lg rounded-lg p-4 z-30">
+            <h3 className="text-lg font-semibold mb-2">Update Your Phone Number</h3>
+            <input
+              type="text"
+              placeholder="Enter 10-digit number"
+              value={phone}
+              onChange={handlePhoneChange}
+              className="w-full border border-gray-300 rounded-md p-2 text-sm"
+            />
+            {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
+
             <button
-              onClick={() => {
-                setShowCard(true);
-                setDropdownOpen(false);
-              }}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100"
+              onClick={handleUpdateClick}
+              className="mt-3 w-full bg-[#10a395] text-white px-4 py-2 rounded-md hover:bg-[#0d8a7e]"
+              disabled={loading}
             >
-              Update Your Phone Number
+              {loading ? "Updating..." : "Update"}
+            </button>
+
+            <button
+              className="text-xs text-gray-500 mt-3 hover:underline"
+              onClick={() => setShowCard(false)}
+            >
+              Close
             </button>
           </div>
         )}
-      </div>
+      </nav>
 
-      {showCard && (
-        <div className="absolute top-16 right-6 w-80 bg-white shadow-lg rounded-lg p-4 z-30">
-          <h3 className="text-lg font-semibold mb-2">Update Your Phone Number</h3>
-          <input
-            type="text"
-            placeholder="Enter 10-digit number"
-            value={phone}
-            onChange={handlePhoneChange}
-            className="w-full border border-gray-300 rounded-md p-2 text-sm"
-          />
-          {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
-
-          <button
-            onClick={handleUpdateClick}
-            className="mt-3 w-full bg-[#10a395] text-white px-4 py-2 rounded-md hover:bg-[#0d8a7e]"
-            disabled={loading}
-          >
-            {loading ? "Updating..." : "Update"}
-          </button>
-
-          {updateStatus && (
-            <p className={`mt-2 text-sm ${updateStatus.success ? "text-green-600" : "text-red-500"}`}>
-              {updateStatus.message}
-            </p>
-          )}
-
-          <button
-            className="text-xs text-gray-500 mt-3 hover:underline"
-            onClick={() => setShowCard(false)}
-          >
-            Close
-          </button>
-        </div>
-      )}
-    </nav>
+      <ToastContainer position="top-center" autoClose={3000} />
+    </>
   );
 };
 

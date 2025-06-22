@@ -14,7 +14,7 @@ export const fetchMDName = async (token) => {
 // Update Phone Number
 export const updatePhoneNumber = async (phoneNumber, token) => {
   return await axios.put(
-    `${API_URL}/update-phone-number`,
+    `${API_URL}md/update-phone`,
     {
       phone_number: `91${phoneNumber}`,
     },
