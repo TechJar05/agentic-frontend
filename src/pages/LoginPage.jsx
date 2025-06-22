@@ -221,16 +221,21 @@ const LoginPage = () => {
               disabled={loading}
               className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium !rounded-button whitespace-nowrap cursor-pointer"
             >
-              {loading ? "Loading..." : "Log In"}
+              {loading ? "Logging in..." : "Log In"}
             </button>
 
-            <div className="flex justify-end">
-              <div
-                className="text-sm hover:text-[#0d8a7e] text-[#10a395] hover:cursor-pointer hover:underline mt-6 flex gap-1 justify-end w-fit"
-                onClick={() => navigate("/register")}
-              >
-                <p className="font-medium">Register Now</p>
-                <ArrowRightCircle size={20} />
+            <div className="flex justify-center">
+              <div className="flex flex-col items-center mt-6">
+                <p className="text-sm text-gray-700 mb-1">
+                  Don't have an account yet?
+                </p>
+                <div
+                  className="text-sm hover:text-[#0d8a7e] text-[#10a395] hover:cursor-pointer hover:underline flex gap-1 items-center justify-center"
+                  onClick={() => navigate("/register")}
+                >
+                  <p className="font-medium">Register Now</p>
+                  <ArrowRightCircle size={20} />
+                </div>
               </div>
             </div>
           </form>

@@ -260,16 +260,21 @@ import useMDs from "../hooks/useMDs";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const { user, token } = useAuth();
-  // console.log("Auth user:", user);
-  // console.log("Token:", token);
+  const { user, token, logout } = useAuth(); // ✅ added logout
+  const navigate = useNavigate(); // ✅ used for redirection
 
-  const { mds, loading, handleReject,handleApprove } = useMDs(user?.id, token);
+  const { mds, loading, handleReject, handleApprove } = useMDs(user?.id, token);
+
+  const handleLogout = () => {
+    logout(); // ⬅️ Clear auth context & localStorage
+    navigate("/"); // ⬅️ Redirect to login
+  };
 
   const filteredMDs = mds.filter((md) => {
     const matchesStatus =
@@ -284,12 +289,20 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50 px-4 py-4 md:px-8">
       <ToastContainer />
 
-      <header className="bg-white shadow-sm mb-6 p-4 rounded">
+      {/* Header with Logout */}
+      <header className="bg-white shadow-sm mb-6 p-4 rounded flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">
           MD Approval Dashboard
         </h1>
+        <button
+          onClick={handleLogout}
+          className="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-semibold"
+        >
+          Logout
+        </button>
       </header>
 
+      {/* Filters & Search */}
       <div className="bg-white p-4 rounded shadow-sm mb-4 flex flex-col md:flex-row justify-between items-center">
         <div className="flex gap-2 flex-wrap mb-2 md:mb-0">
           {["all", "approved", "pending", "rejected"].map((status) => (
@@ -315,6 +328,7 @@ const AdminDashboard = () => {
         />
       </div>
 
+      {/* MD Table */}
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         {loading ? (
           <div className="p-4 text-center text-gray-500">Loading...</div>

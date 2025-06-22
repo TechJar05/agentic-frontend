@@ -305,7 +305,7 @@
 
 import React, { useState } from "react";
 import agenticLogo from "../assets/agenticLogo.png";
-import { ArrowLeftCircle } from "lucide-react";
+import { ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
 import { ToastContainer, toast } from "react-toastify";
@@ -339,7 +339,8 @@ const RegisterPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "phoneNumber" && (!/^\d*$/.test(value) || value.length > 10)) return;
+    if (name === "phoneNumber" && (!/^\d*$/.test(value) || value.length > 10))
+      return;
 
     setFormData({ ...formData, [name]: value });
     if (errors[name]) setErrors({ ...errors, [name]: "" });
@@ -353,11 +354,16 @@ const RegisterPage = () => {
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!emailRegex.test(formData.email)) newErrors.email = "Enter a valid email address";
-    if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
-    else if (formData.password !== formData.confirmPassword) newErrors.password = "Passwords do not match";
-    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone number is required";
-    else if (!/^\d{10}$/.test(formData.phoneNumber)) newErrors.phoneNumber = "Phone number must be exactly 10 digits";
+    else if (!emailRegex.test(formData.email))
+      newErrors.email = "Enter a valid email address";
+    if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+    else if (formData.password !== formData.confirmPassword)
+      newErrors.password = "Passwords do not match";
+    if (!formData.phoneNumber.trim())
+      newErrors.phoneNumber = "Phone number is required";
+    else if (!/^\d{10}$/.test(formData.phoneNumber))
+      newErrors.phoneNumber = "Phone number must be exactly 10 digits";
 
     setErrors(newErrors);
     if (Object.values(newErrors).some((e) => e)) return;
@@ -366,7 +372,7 @@ const RegisterPage = () => {
     if (response.status >= 300) {
       toast.error(response.data.message || "Registration failed");
       return;
-}
+    }
 
     toast.success("OTP sent to your email");
     setStep("otp");
@@ -375,26 +381,28 @@ const RegisterPage = () => {
   };
 
   const handleOtpSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
-    setErrors((prev) => ({ ...prev, otp: "OTP must be 6 digits" }));
-    return;
-  }
-
-  const otpVerifyResponse = await verifyOtp(formData.email, otp);
-  if (otpVerifyResponse.status >= 300) {
-      toast.error(otpVerifyResponse?.response?.data?.message || "OTP verification failed.");
+    if (otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+      setErrors((prev) => ({ ...prev, otp: "OTP must be 6 digits" }));
       return;
-}
+    }
 
-  toast.success("Successfully registered!");
-  setTimeout(() => navigate("/"), 1500);
-};
+    const otpVerifyResponse = await verifyOtp(formData.email, otp);
+    if (otpVerifyResponse.status >= 300) {
+      toast.error(
+        otpVerifyResponse?.response?.data?.message || "OTP verification failed."
+      );
+      return;
+    }
+
+    toast.success("Successfully registered!");
+    setTimeout(() => navigate("/login"), 1500);
+  };
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <ToastContainer />
-       <div className="w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
+      <div className="w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
         <div className="flex justify-center mb-8 mt-4 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
           <img src={agenticLogo} alt="Agentic Logo" className="w-14 h-14" />
           <div className="text-3xl flex items-center font-bold text-gray-800">
@@ -405,15 +413,36 @@ const RegisterPage = () => {
         <div className="bg-white rounded-lg shadow-md p-8 w-full">
           {step === "register" ? (
             <>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Create New Account</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                Create New Account
+              </h2>
               <form onSubmit={handleSubmit}>
                 {/* Name */}
-                <InputField icon="fas fa-user" name="name" placeholder="Name" value={formData.name} error={errors.name} onChange={handleInputChange} />
+                <InputField
+                  icon="fas fa-user"
+                  name="name"
+                  placeholder="Name"
+                  value={formData.name}
+                  error={errors.name}
+                  onChange={handleInputChange}
+                />
                 {/* Email */}
-                <InputField icon="fas fa-envelope" name="email" placeholder="Email" value={formData.email} error={errors.email} onChange={handleInputChange} type="email" />
+                <InputField
+                  icon="fas fa-envelope"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  error={errors.email}
+                  onChange={handleInputChange}
+                  type="email"
+                />
                 {/* Phone */}
                 <div className="mb-5">
-                  <div className={`flex items-center border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"} rounded-md px-3 focus-within:border-[#10a395]`}>
+                  <div
+                    className={`flex items-center border ${
+                      errors.phoneNumber ? "border-red-500" : "border-gray-300"
+                    } rounded-md px-3 focus-within:border-[#10a395]`}
+                  >
                     <span className="text-gray-400 text-sm">+91</span>
                     <input
                       type="text"
@@ -424,21 +453,46 @@ const RegisterPage = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {errors.phoneNumber && <p className="text-red-600 text-xs mt-1">{errors.phoneNumber}</p>}
+                  {errors.phoneNumber && (
+                    <p className="text-red-600 text-xs mt-1">
+                      {errors.phoneNumber}
+                    </p>
+                  )}
                 </div>
                 {/* Password */}
-                <PasswordField show={showPassword} toggle={() => setShowPassword(!showPassword)} name="password" placeholder="Password" value={formData.password} onChange={handleInputChange} error={errors.password} />
+                <PasswordField
+                  show={showPassword}
+                  toggle={() => setShowPassword(!showPassword)}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  error={errors.password}
+                />
                 {/* Confirm Password */}
-                <PasswordField show={showPassword} toggle={() => setShowPassword(!showPassword)} name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleInputChange} />
+                <PasswordField
+                  show={showPassword}
+                  toggle={() => setShowPassword(!showPassword)}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                />
 
-                <button type="submit" disabled={loading} className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium"
+                >
                   {loading ? "Registering..." : "Register"}
                 </button>
               </form>
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Verify OTP</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                Verify OTP
+              </h2>
               <form onSubmit={handleOtpSubmit}>
                 <input
                   type="text"
@@ -447,17 +501,31 @@ const RegisterPage = () => {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                 />
-                {errors.otp && <p className="text-red-600 text-xs mb-2">{errors.otp}</p>}
-                <button type="submit" className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium mb-3" disabled={loading}>
+                {errors.otp && (
+                  <p className="text-red-600 text-xs mb-2">{errors.otp}</p>
+                )}
+                <button
+                  type="submit"
+                  className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium mb-3"
+                  disabled={loading}
+                >
                   {loading ? "Verifying..." : "Verify and Complete"}
                 </button>
               </form>
             </>
           )}
 
-          <div className="text-sm text-[#10a395] mt-6 flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
-            <ArrowLeftCircle size={20} />
-            <p className="font-medium">Log In</p>
+          <div className="flex flex-col items-center justify-center text-center mt-6">
+            <p className="text-sm text-gray-700 mb-2">
+              Already have an account?
+            </p>
+            <div
+              className="text-sm text-[#10a395] flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate("/")}
+            >
+              <ArrowRightCircle size={20} />
+              <p className="font-medium">Log In</p>
+            </div>
           </div>
         </div>
       </div>
@@ -465,9 +533,21 @@ const RegisterPage = () => {
   );
 };
 
-const InputField = ({ icon, name, placeholder, value, onChange, error, type = "text" }) => (
+const InputField = ({
+  icon,
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  type = "text",
+}) => (
   <div className="mb-5">
-    <div className={`flex items-center border ${error ? "border-red-500" : "border-gray-300"} rounded-md px-3 focus-within:border-[#10a395]`}>
+    <div
+      className={`flex items-center border ${
+        error ? "border-red-500" : "border-gray-300"
+      } rounded-md px-3 focus-within:border-[#10a395]`}
+    >
       <i className={`${icon} text-gray-400 text-lg`}></i>
       <input
         type={type}
@@ -482,9 +562,21 @@ const InputField = ({ icon, name, placeholder, value, onChange, error, type = "t
   </div>
 );
 
-const PasswordField = ({ name, placeholder, value, onChange, error, show, toggle }) => (
+const PasswordField = ({
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  show,
+  toggle,
+}) => (
   <div className="mb-5">
-    <div className={`flex items-center border ${error ? "border-red-500" : "border-gray-300"} rounded-md px-3 focus-within:border-[#10a395]`}>
+    <div
+      className={`flex items-center border ${
+        error ? "border-red-500" : "border-gray-300"
+      } rounded-md px-3 focus-within:border-[#10a395]`}
+    >
       <i className="fas fa-lock text-gray-400 text-lg"></i>
       <input
         type={show ? "text" : "password"}
