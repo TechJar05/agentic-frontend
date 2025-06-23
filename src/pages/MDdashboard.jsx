@@ -108,7 +108,7 @@
 
 // export default MDdashboard;
 
-import React, { useEffect, useState } from "react";
+  import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import useDashboard from "../hooks/useDashboard";
@@ -138,7 +138,6 @@ ChartJS.register(
 const MDdashboard = () => {
   const navigate = useNavigate();
   const { loadDashboardData, loading } = useDashboard();
-
   const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
@@ -155,11 +154,10 @@ const MDdashboard = () => {
     fetchData();
   }, []);
 
-  const handleViewAllTasks = () => {
-    navigate("/task-logs");
-  };
+  const handleViewAllTasks = () => navigate("/task-logs");
 
-  if (loading || !dashboardData) return <div className="p-4">Loading...</div>;
+  if (loading || !dashboardData)
+    return <div className="p-4 animate-pulse text-gray-600">Loading...</div>;
 
   const chartData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -169,7 +167,7 @@ const MDdashboard = () => {
         data: dashboardData.taskCompletionRate || [10, 20, 30, 25, 35, 20, 30],
         fill: true,
         backgroundColor: "rgba(0, 150, 138, 0.2)",
-        borderColor: "rgba(1, 117, 48, 1)",
+        borderColor: "rgba(0, 150, 138, 1)",
         tension: 0.3,
       },
     ],
@@ -185,31 +183,40 @@ const MDdashboard = () => {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
+      {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 font-bold">
         {metrics.map((metric, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-sm p-4 sm:p-6 flex justify-between items-center">
+          <div
+            key={index}
+            onClick={handleViewAllTasks}
+            className="cursor-pointer bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 flex justify-between items-center hover:shadow-lg hover:scale-105 transition-transform duration-300"
+          >
             <div>
-              <p className="text-black text-sm">{metric.title}</p>
-              <h3 className="text-3xl text-gray-500 mt-1">{metric.value}</h3>
+              <p className="text-gray-700 text-sm">{metric.title}</p>
+              <h3 className="text-3xl text-[#00968a] mt-1 font-semibold">
+                {metric.value}
+              </h3>
             </div>
-            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-800">
+            <div className="w-12 h-12 rounded-full bg-[#e6f9f7] flex items-center justify-center text-[#00968a] border border-[#c0f0ec]">
               <i className={`fas ${metric.icon} text-xl`}></i>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-8 overflow-x-auto">
-        <h3 className="text-xl font-semibold mb-4">Task Completion Rate</h3>
+      {/* Chart Section */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mb-8 overflow-x-auto transition-all hover:shadow-lg hover:scale-[1.01]">
+        <h3 className="text-xl font-semibold mb-4 text-gray-700">Task Completion Rate</h3>
         <div className="min-w-[320px]">
           <Line data={chartData} />
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center">
+      {/* View All Tasks Button */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 text-center hover:shadow-lg transition">
         <button
           onClick={handleViewAllTasks}
-          className="w-full sm:w-auto px-6 py-3 bg-[#00968a] text-white rounded-lg hover:bg-[#007870] flex items-center justify-center mx-auto transition duration-200"
+          className="w-full sm:w-auto px-6 py-3 bg-[#00968a] text-white rounded-lg hover:bg-[#007870] flex items-center justify-center mx-auto transition-all duration-200 transform hover:scale-105"
         >
           <i className="fas fa-tasks mr-2"></i>
           View All Tasks

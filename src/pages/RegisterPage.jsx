@@ -304,7 +304,7 @@
 // export default RegisterPage;
 
 import React, { useState } from "react";
-import agenticLogo from "../assets/agenticLogo.png";
+import eaBot from "../assets/eaBot.png"; 
 import { ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
@@ -397,16 +397,16 @@ const RegisterPage = () => {
     }
 
     toast.success("Successfully registered!");
-    setTimeout(() => navigate("/"), 1500);
+    setTimeout(() => navigate("/login"), 1500);
   };
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <ToastContainer />
       <div className="w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
         <div className="flex justify-center mb-8 mt-4 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
-          <img src={agenticLogo} alt="Agentic Logo" className="w-14 h-14" />
+          <img src={eaBot} alt="Agentic Logo" className="w-14 h-14" />
           <div className="text-3xl flex items-center font-bold text-gray-800">
-            <p>AGENTIC</p>
+            <p>EA BOT</p>
           </div>
         </div>
 
@@ -521,7 +521,7 @@ const RegisterPage = () => {
             </p>
             <div
               className="text-sm text-[#10a395] flex items-center gap-2 cursor-pointer"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/login")}
             >
               <ArrowRightCircle size={20} />
               <p className="font-medium">Log In</p>

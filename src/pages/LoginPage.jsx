@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import agenticLogo from "../assets/agenticLogo.png";
+import eaBot from "../assets/eaBot.png"; 
 import { ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
@@ -111,9 +111,9 @@ const LoginPage = () => {
       <ToastContainer position="top-center" />
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
-          <img src={agenticLogo} alt="Agentic Logo" className="w-14 h-14" />
+          <img src={eaBot} alt="Agentic Logo" className="w-14 h-14" />
           <div className="text-3xl flex items-center font-bold text-gray-800 ">
-            <p>AGENTIC</p>
+            <p>EA BOT</p>
           </div>
         </div>
 

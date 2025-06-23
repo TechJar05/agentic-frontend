@@ -273,7 +273,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     logout(); // ⬅️ Clear auth context & localStorage
-    navigate("/"); // ⬅️ Redirect to login
+    navigate("/login"); // ⬅️ Redirect to login
   };
 
   const filteredMDs = mds.filter((md) => {
