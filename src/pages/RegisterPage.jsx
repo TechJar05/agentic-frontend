@@ -421,7 +421,7 @@ const RegisterPage = () => {
                 <InputField
                   icon="fas fa-user"
                   name="name"
-                  placeholder="Name"
+                  placeholder="First Name"
                   value={formData.name}
                   error={errors.name}
                   onChange={handleInputChange}

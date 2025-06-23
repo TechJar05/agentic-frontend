@@ -54,33 +54,63 @@ import React, { useState } from "react";
 import { useNav } from "../hooks/useNav";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { updatePhoneNumber } from "../services/navService";
+import { useAuth } from "../context/authContext";
 
 const Navbar = () => {
-  const { mdName, updatePhone,loading } = useNav();
+  const { mdName, loading } = useNav();
+  const { token, setUser, user } = useAuth();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [phone, setPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [name, setName] = useState("");
+  const [formError, setFormError] = useState("");
 
   const handlePhoneChange = (e) => {
     const val = e.target.value;
     if (!/^\d*$/.test(val) || val.length > 10) return;
     setPhone(val);
-    setPhoneError("");
+    setFormError("");
   };
 
   const handleUpdateClick = async () => {
-    if (phone.length !== 10) {
-      setPhoneError("Phone number must be exactly 10 digits");
+    if (!name.trim() && phone.length !== 10) {
+      setFormError("Please update either name or phone number.");
       return;
     }
-    const res = await updatePhone(phone);
-    if (res?.success) {
-      toast.success(res.message);
-      setShowCard(false);
-      setPhone("");
-    } else {
-      toast.error(res?.message || "Something went wrong");
+
+    const payload = {
+      name: name.trim() || "",
+      phone_number: phone.length === 10 ? `91${phone}` : "",
+    };
+
+    try {
+      const res = await updatePhoneNumber(payload, token);
+
+      if (res?.data?.message) {
+        // Update local context
+        if (name.trim()) {
+          setUser((prev) => ({ ...prev, name: name.trim() }));
+        }
+
+        if (name && phone) {
+          toast.success("Name and Phone updated successfully.");
+        } else if (name) {
+          toast.success("Name updated successfully.");
+        } else {
+          toast.success("Phone number updated successfully.");
+        }
+
+        setShowCard(false);
+        setPhone("");
+        setName("");
+      } else {
+        toast.error("Something went wrong.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Update failed.");
     }
   };
 
@@ -107,7 +137,7 @@ const Navbar = () => {
                 }}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
               >
-                Update Your Phone Number
+                Update Your Profile
               </button>
             </div>
           )}
@@ -115,15 +145,30 @@ const Navbar = () => {
 
         {showCard && (
           <div className="absolute top-16 right-6 w-80 bg-white shadow-lg rounded-lg p-4 z-30">
-            <h3 className="text-lg font-semibold mb-2">Update Your Phone Number</h3>
+            <h3 className="text-lg font-semibold mb-3">Update Your Profile</h3>
+
             <input
               type="text"
-              placeholder="Enter 10-digit number"
+              placeholder="First Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setFormError("");
+              }}
+              className="w-full border border-gray-300 rounded-md p-2 text-sm mb-3"
+            />
+
+            <input
+              type="text"
+              placeholder="10-digit Phone Number"
               value={phone}
               onChange={handlePhoneChange}
               className="w-full border border-gray-300 rounded-md p-2 text-sm"
             />
-            {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
+
+            {formError && (
+              <p className="text-red-500 text-sm mt-2">{formError}</p>
+            )}
 
             <button
               onClick={handleUpdateClick}
@@ -135,7 +180,10 @@ const Navbar = () => {
 
             <button
               className="text-xs text-gray-500 mt-3 hover:underline"
-              onClick={() => setShowCard(false)}
+              onClick={() => {
+                setShowCard(false);
+                setFormError("");
+              }}
             >
               Close
             </button>

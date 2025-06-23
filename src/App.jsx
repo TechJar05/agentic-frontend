@@ -32,10 +32,10 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom"; // Make sure Navigate is imported here
+} from "react-router-dom"; 
 import { useState } from "react";
 import MDdashboard from "./pages/MDdashboard";
-import AdminDashboard from "./pages/AdminDashboard"; // Import the Admin Dashboard
+import AdminDashboard from "./pages/AdminDashboard"; 
 import ManageEmployee from "./pages/ManageEmployee";
 import Layout from "./components/Layout";
 import TaskLogs from "./pages/TaskLogs";
@@ -62,12 +62,10 @@ function App() {
       />
 
       <Routes>
-        {/* Starting Page - LoginPage */}
+       
         <Route path="/" element={<LoginPage setUser={setUser} />} />
         <Route path="/register" element={<RegisterPage />} />
-        {/* Redirect to login as the starting page */}
-        {/* Routes for pages that need the Layout (sidebar and navbar) */}
-        {/* Route for Admin Dashboard after login */}
+       
         <Route
           path="/admin-dashboard"
           element={
