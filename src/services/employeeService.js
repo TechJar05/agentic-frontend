@@ -23,19 +23,28 @@ export const addEmployee = async (employeeData, token) => {
 };
 
 // Update employee phone number
-export const updateEmployeePhone = async (employeeId, phone, token) => {
+export const updateEmployeePhone = async (employeeId, updatedData, token) => {
+  const payload = {};
+
+  if (updatedData.employeeName) {
+    payload.name = updatedData.employeeName;
+  }
+  if (updatedData.phoneNumber) {
+    payload.phone_number = updatedData.phoneNumber;
+  }
+
   const res = await axios.put(
     `${API_URL}md/update-employee-phone/${employeeId}`,
-    { phone_number: phone },
+    payload,
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }
   );
+
   return res.data;
 };
-
 // Delete employee
 export const deleteEmployee = async (employeeId, token) => {
   const res = await axios.delete(`${API_URL}md/delete-employee/${employeeId}`, {

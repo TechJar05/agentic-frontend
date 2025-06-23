@@ -107,8 +107,7 @@
 // };
 
 // export default MDdashboard;
-
-  import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Line } from "react-chartjs-2";
 import useDashboard from "../hooks/useDashboard";
@@ -157,7 +156,11 @@ const MDdashboard = () => {
   const handleViewAllTasks = () => navigate("/task-logs");
 
   if (loading || !dashboardData)
-    return <div className="p-4 animate-pulse text-gray-600">Loading...</div>;
+    return (
+      <div className="p-8 text-center text-gray-600 animate-pulse">
+        Loading Dashboard...
+      </div>
+    );
 
   const chartData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -166,8 +169,8 @@ const MDdashboard = () => {
         label: "Task Completion Rate",
         data: dashboardData.taskCompletionRate || [10, 20, 30, 25, 35, 20, 30],
         fill: true,
-        backgroundColor: "rgba(0, 150, 138, 0.2)",
-        borderColor: "rgba(0, 150, 138, 1)",
+        backgroundColor: "rgba(16, 163, 149, 0.15)",
+        borderColor: "#10a395",
         tension: 0.3,
       },
     ],
@@ -182,22 +185,22 @@ const MDdashboard = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
+    <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-[#f3f7f6] to-[#e8f3f2] min-h-screen">
       {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 font-bold">
         {metrics.map((metric, index) => (
           <div
             key={index}
             onClick={handleViewAllTasks}
-            className="cursor-pointer bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 flex justify-between items-center hover:shadow-lg hover:scale-105 transition-transform duration-300"
+            className="cursor-pointer  bg-white border border-gray-400 rounded-2xl p-6 flex justify-between items-center hover:shadow-[0_0_15px_rgba(16,163,149,0.3)] hover:scale-[1.02] transition-all duration-300"
           >
             <div>
-              <p className="text-gray-700 text-sm">{metric.title}</p>
-              <h3 className="text-3xl text-[#00968a] mt-1 font-semibold">
+              <p className="text-sm text-gray-600 mb-1">{metric.title}</p>
+              <h3 className="text-3xl text-[#10a395] font-bold">
                 {metric.value}
               </h3>
             </div>
-            <div className="w-12 h-12 rounded-full bg-[#e6f9f7] flex items-center justify-center text-[#00968a] border border-[#c0f0ec]">
+            <div className="w-12 h-12 rounded-full bg-[#e6f9f7] flex items-center justify-center text-[#10a395] border border-[#b5eae4] shadow-sm">
               <i className={`fas ${metric.icon} text-xl`}></i>
             </div>
           </div>
@@ -205,18 +208,20 @@ const MDdashboard = () => {
       </div>
 
       {/* Chart Section */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 mb-8 overflow-x-auto transition-all hover:shadow-lg hover:scale-[1.01]">
-        <h3 className="text-xl font-semibold mb-4 text-gray-700">Task Completion Rate</h3>
+      <div className="bg-white border border-gray-400 rounded-2xl shadow-sm p-6 mb-10 hover:shadow-[0_0_15px_rgba(16,163,149,0.2)] hover:scale-[1.01] transition-transform duration-300">
+        <h3 className="text-lg sm:text-xl font-semibold mb-4 text-gray-700">
+          Weekly Task Completion Rate
+        </h3>
         <div className="min-w-[320px]">
           <Line data={chartData} />
         </div>
       </div>
 
       {/* View All Tasks Button */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-5 sm:p-6 text-center hover:shadow-lg transition">
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center hover:shadow-[0_0_12px_rgba(16,163,149,0.2)] transition">
         <button
           onClick={handleViewAllTasks}
-          className="w-full sm:w-auto px-6 py-3 bg-[#00968a] text-white rounded-lg hover:bg-[#007870] flex items-center justify-center mx-auto transition-all duration-200 transform hover:scale-105"
+          className="w-full sm:w-auto px-6 py-3 cursor-pointer bg-[#10a395] text-white rounded-lg font-medium hover:bg-[#0d8a7e] transition-all duration-300 transform hover:scale-105"
         >
           <i className="fas fa-tasks mr-2"></i>
           View All Tasks
