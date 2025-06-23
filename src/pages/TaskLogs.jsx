@@ -198,16 +198,19 @@ const TaskLogs = () => {
     const matchesQuery = task.assignedTo
       ?.toLowerCase()
       .includes(searchQuery.toLowerCase());
+
     const matchesStatus =
       statusFilter === "all" ||
-      task.status?.toLowerCase().replace(" ", "") === statusFilter;
+      task.taskStatus?.toLowerCase().replace(" ", "") === statusFilter;
+
     const matchesPriority =
       priorityFilter === "all" ||
       task.priority?.toLowerCase() === priorityFilter;
+
     const matchesApproval =
       approvalFilter === "all" ||
-      (approvalFilter === "pending" && task.pendingApproval) ||
-      (approvalFilter === "approved" && !task.pendingApproval);
+      (approvalFilter === "pending" && task.mdApproval === "pending") ||
+      (approvalFilter === "approved" && task.mdApproval !== "pending");
 
     return matchesQuery && matchesStatus && matchesPriority && matchesApproval;
   });
@@ -249,6 +252,7 @@ const TaskLogs = () => {
               <option value="todo">To Do</option>
               <option value="inprogress">In Progress</option>
               <option value="completed">Completed</option>
+              <option value="pending">Pending</option>
             </select>
           </div>
           <div>
@@ -322,36 +326,38 @@ const TaskLogs = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredTasks.map((task) => (
-              <tr key={task.id} className="hover:bg-gray-50">
+              <tr key={task.taskId} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {task.id}
+                  {task.taskId}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {task.description}
+                  {task.taskDesc}
                 </td>
-                <td className="px-6 py-4 text-sm text-gray-500">{task.dept}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {task.department}
+                </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {task.assignedTo}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
-                      task.status === "Completed"
+                      task.taskStatus === "completed"
                         ? "bg-green-100 text-green-800"
-                        : task.status === "In Progress"
+                        : task.taskStatus === "inprogress"
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-gray-100 text-gray-800"
                     }`}
                   >
-                    {task.status}
+                    {task.taskStatus}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
-                      task.priority === "High"
+                      task.priority === "HIGH"
                         ? "bg-red-100 text-red-800"
-                        : task.priority === "Medium"
+                        : task.priority === "MEDIUM"
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-blue-100 text-blue-800"
                     }`}
@@ -368,12 +374,12 @@ const TaskLogs = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full ${
-                      task.pendingApproval
+                      task.mdApproval === "pending"
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-green-100 text-green-800"
                     }`}
                   >
-                    {task.pendingApproval ? "Pending" : "Approved"}
+                    {task.mdApproval === "pending" ? "Pending" : "Approved"}
                   </span>
                 </td>
               </tr>

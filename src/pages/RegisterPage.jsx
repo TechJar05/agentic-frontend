@@ -397,7 +397,7 @@ const RegisterPage = () => {
     }
 
     toast.success("Successfully registered!");
-    setTimeout(() => navigate("/login"), 1500);
+    setTimeout(() => navigate("/"), 1500);
   };
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">

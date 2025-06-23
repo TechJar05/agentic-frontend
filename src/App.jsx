@@ -44,7 +44,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const [user, setUser] = useState(null); // Replace this with your actual authentication logic
@@ -71,12 +71,9 @@ function App() {
         <Route
           path="/admin-dashboard"
           element={
-            user && user.role === "admin" ? (
+            <ProtectedRoute>
               <AdminDashboard />
-            ) : (
-              <AdminDashboard />
-              // <Navigate to="/login" />
-            )
+            </ProtectedRoute>
           }
         />
         <Route path="/" element={<Layout />}>

@@ -3,9 +3,8 @@ import taskService from '../services/taskService';
 import { useAuth } from '../context/authContext';
 
 const useTaskLogs = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const mdId = user?.id;
-  const token = user?.token;
 
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,8 +19,9 @@ const useTaskLogs = () => {
     const fetchTasksData = async () => {
       try {
         if (!mdId || !token) return;
+
         const data = await taskService.fetchTasks(mdId, token);
-        setTasks(data?.taskLogs || []);
+        setTasks(data); // Already returns just taskLogs array
       } catch {
         setError('Failed to load tasks');
       } finally {
