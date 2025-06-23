@@ -39,16 +39,28 @@ import AdminDashboard from "./pages/AdminDashboard"; // Import the Admin Dashboa
 import ManageEmployee from "./pages/ManageEmployee";
 import Layout from "./components/Layout";
 import TaskLogs from "./pages/TaskLogs";
-import Profile from "./pages/Profile";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function App() {
   const [user, setUser] = useState(null); // Replace this with your actual authentication logic
 
   return (
     <Router>
+    <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+
       <Routes>
         {/* Starting Page - LoginPage */}
         <Route path="/" element={<LoginPage setUser={setUser} />} />
@@ -84,7 +96,7 @@ function App() {
           {/* Other Routes */}
           <Route path="/manage-employee" element={<ManageEmployee />} />
           <Route path="/task-logs" element={<TaskLogs />} />
-          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/profile" element={<Profile />} /> */}
         </Route>
         {/* Routes for Login and Register pages without Layout */}
         {/* <Route path="/login" element={<LoginPage setUser={setUser} />} /> */}

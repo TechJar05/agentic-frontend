@@ -1,27 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { fetchDashboardData } from "../services/dashboardService";
+import { useAuth } from "../context/authContext";
 
 const useDashboard = () => {
-  // const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(null);
+  const { user, token } = useAuth(); // ✅ Get MD details from context
 
-  // useEffect(() => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const response = await fetchDashboardData(); // Get the data from the service
-
-      return response; // Set the dashboard data
+      const response = await fetchDashboardData(user?.id, token); // ✅ use user.id
+      return response;
     } catch (error) {
       return error;
     } finally {
-      setLoading(false); // Set loading to false once the data is fetched
+      setLoading(false);
     }
   };
-
-  //   loadDashboardData();
-  // }, []);
 
   return {
     loadDashboardData,

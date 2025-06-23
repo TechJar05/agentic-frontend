@@ -109,9 +109,9 @@
 // export default MDdashboard;
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Navigation hook
-import { Line } from "react-chartjs-2"; // Chart component
-import useDashboard from "../hooks/useDashboard"; // Import the custom hook to fetch dashboard data
+import { useNavigate } from "react-router-dom";
+import { Line } from "react-chartjs-2";
+import useDashboard from "../hooks/useDashboard";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -136,24 +136,16 @@ ChartJS.register(
 );
 
 const MDdashboard = () => {
-  const navigate = useNavigate(); // Hook to navigate to other pages
-  const { loadDashboardData, loading } = useDashboard(); // Using the custom hook to fetch dashboard data
+  const navigate = useNavigate();
+  const { loadDashboardData, loading } = useDashboard();
 
-  const [dashboardData, setDashboardData] = useState({
-    userName: "MD Name",
-    totalEmployees: 10,
-    tasksAssigned: 7,
-    tasksCompleted: 4,
-    tasksInProgress: 3,
-    pendingApprovals: 2,
-  });
+  const [dashboardData, setDashboardData] = useState(null);
 
-  // Fetch the dashboard data when the component mounts
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await loadDashboardData(); // Call the hook to get the dashboard data
-        setDashboardData(response.data.data); // Set the fetched data to state
+        const response = await loadDashboardData();
+        setDashboardData(response.data.data);
       } catch (error) {
         console.log("Error fetching dashboard data:", error);
         alert("Failed to fetch dashboard data");
@@ -163,13 +155,11 @@ const MDdashboard = () => {
     fetchData();
   }, []);
 
-  // Handle the button click to navigate to the Task Logs page
   const handleViewAllTasks = () => {
     navigate("/task-logs");
   };
 
-  if (loading) return <div>Loading...</div>; // Show loading state while data is being fetched
-  // if (error) return <div>Error: {error}</div>; // Show error message if data fetching fails
+  if (loading || !dashboardData) return <div className="p-4">Loading...</div>;
 
   const chartData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -178,68 +168,48 @@ const MDdashboard = () => {
         label: "Task Completion Rate",
         data: dashboardData.taskCompletionRate || [10, 20, 30, 25, 35, 20, 30],
         fill: true,
-        backgroundColor: "rgba(0, 150, 138,0.2)",
-        borderColor: "rgba(1, 117, 48,1)",
+        backgroundColor: "rgba(0, 150, 138, 0.2)",
+        borderColor: "rgba(1, 117, 48, 1)",
         tension: 0.3,
       },
     ],
   };
 
   const metrics = [
-    {
-      title: "Total Employees",
-      value: dashboardData.totalEmployees,
-      icon: "fa-users",
-    },
-    {
-      title: "Tasks Assigned",
-      value: dashboardData.tasksAssigned,
-      icon: "fa-tasks",
-    },
-    {
-      title: "Tasks In Progress",
-      value: dashboardData.tasksInProgress,
-      icon: "fa-spinner",
-    },
-    {
-      title: "Pending Approval",
-      value: dashboardData.pendingApprovals,
-      icon: "fa-clock",
-    },
-    {
-      title: "Tasks Completed",
-      value: dashboardData.tasksCompleted,
-      icon: "fa-check",
-    },
+    { title: "Total Employees", value: dashboardData.totalEmployees, icon: "fa-users" },
+    { title: "Tasks Assigned", value: dashboardData.tasksAssigned, icon: "fa-tasks" },
+    { title: "Tasks In Progress", value: dashboardData.tasksInProgress, icon: "fa-spinner" },
+    { title: "Pending Approval", value: dashboardData.pendingApprovals, icon: "fa-clock" },
+    { title: "Tasks Completed", value: dashboardData.tasksCompleted, icon: "fa-check" },
   ];
 
   return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 font-bold">
+    <div className="p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 font-bold">
         {metrics.map((metric, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-black text-sm">{metric.title}</p>
-                <h3 className="text-3xl text-gray-500 mt-1">{metric.value}</h3>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-800">
-                <i className={`fas ${metric.icon} text-xl`}></i>
-              </div>
+          <div key={index} className="bg-white rounded-xl shadow-sm p-4 sm:p-6 flex justify-between items-center">
+            <div>
+              <p className="text-black text-sm">{metric.title}</p>
+              <h3 className="text-3xl text-gray-500 mt-1">{metric.value}</h3>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-800">
+              <i className={`fas ${metric.icon} text-xl`}></i>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-8 overflow-x-auto">
         <h3 className="text-xl font-semibold mb-4">Task Completion Rate</h3>
-        <Line data={chartData} />
+        <div className="min-w-[320px]">
+          <Line data={chartData} />
+        </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center">
         <button
           onClick={handleViewAllTasks}
-          className="px-6 py-3 bg-[#00968a] text-white rounded-lg hover:bg-[#007870] flex items-center mx-auto cursor-pointer"
+          className="w-full sm:w-auto px-6 py-3 bg-[#00968a] text-white rounded-lg hover:bg-[#007870] flex items-center justify-center mx-auto transition duration-200"
         >
           <i className="fas fa-tasks mr-2"></i>
           View All Tasks

@@ -1,21 +1,28 @@
 import { useState, useEffect } from 'react';
 import taskService from '../services/taskService';
+import { useAuth } from '../context/authContext';
 
 const useTaskLogs = () => {
-  const [tasks, setTasks] = useState([]);  
-  const [loading, setLoading] = useState(true);  
-  const [error, setError] = useState(null);  
-  const [searchQuery, setSearchQuery] = useState('');  
-  const [statusFilter, setStatusFilter] = useState('all');  
-  const [priorityFilter, setPriorityFilter] = useState('all');  
-  const [approvalFilter, setApprovalFilter] = useState('all');  
+  const { user } = useAuth();
+  const mdId = user?.id;
+  const token = user?.token;
+
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [approvalFilter, setApprovalFilter] = useState('all');
 
   useEffect(() => {
     const fetchTasksData = async () => {
       try {
-        const data = await taskService.fetchTasks(searchQuery, statusFilter, priorityFilter, approvalFilter);
-        setTasks(data);  // Set tasks data
-      } catch  {
+        if (!mdId || !token) return;
+        const data = await taskService.fetchTasks(mdId, token);
+        setTasks(data?.taskLogs || []);
+      } catch {
         setError('Failed to load tasks');
       } finally {
         setLoading(false);
@@ -23,7 +30,7 @@ const useTaskLogs = () => {
     };
 
     fetchTasksData();
-  }, [searchQuery, statusFilter, priorityFilter, approvalFilter]);  // Re-fetch when filters change
+  }, [mdId, token]);
 
   return {
     tasks,
