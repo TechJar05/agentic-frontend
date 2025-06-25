@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import useEmployees from "../hooks/useEmployees";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 const ManageEmployee = () => {
@@ -12,7 +12,7 @@ const ManageEmployee = () => {
     loading,
     handleAddEmployee,
     handleUpdatePhone,
-    handleDeleteEmployee,
+    // handleDeleteEmployee,
     refetchEmployees,
   } = useEmployees(mdId);
 
@@ -160,12 +160,12 @@ const ManageEmployee = () => {
                     >
                       Edit
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => handleDeleteEmployee(emp.id)}
                       className="bg-red-600 cursor-pointer text-white px-3 py-1.5 rounded hover:bg-red-700 transition"
                     >
                       Delete
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))}
