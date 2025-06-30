@@ -89,7 +89,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import eaBot from "../assets/eaBot.png";
 import { toast } from "react-toastify";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import {useAuth} from "../context/AuthContext";
+import {useAuth} from "../context/authContext";
 
 const menuItems = [
   {
