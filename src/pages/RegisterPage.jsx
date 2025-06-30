@@ -304,7 +304,7 @@
 // export default RegisterPage;
 
 import React, { useState } from "react";
-import agenticLogo from "../assets/agenticLogo.png";
+import eaBot from "../assets/eaBot.png";
 import { ArrowRightCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRegister } from "../hooks/useRegister";
@@ -314,7 +314,7 @@ import "react-toastify/dist/ReactToastify.css";
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [step, setStep] = useState("register"); // "register" or "otp"
+  const [step, setStep] = useState("register");
   const [otp, setOtp] = useState("");
   // eslint-disable-next-line no-unused-vars
   const [resendDisabled, setResendDisabled] = useState(false);
@@ -335,13 +335,14 @@ const RegisterPage = () => {
     otp: "",
   });
 
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+
   const { register, verifyOtp, loading } = useRegister();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "phoneNumber" && (!/^\d*$/.test(value) || value.length > 10))
-      return;
-
+    if (name === "phoneNumber" && (!/^\d*$/.test(value) || value.length > 10)) return;
     setFormData({ ...formData, [name]: value });
     if (errors[name]) setErrors({ ...errors, [name]: "" });
   };
@@ -354,16 +355,11 @@ const RegisterPage = () => {
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!emailRegex.test(formData.email))
-      newErrors.email = "Enter a valid email address";
-    if (formData.password.length < 6)
-      newErrors.password = "Password must be at least 6 characters";
-    else if (formData.password !== formData.confirmPassword)
-      newErrors.password = "Passwords do not match";
-    if (!formData.phoneNumber.trim())
-      newErrors.phoneNumber = "Phone number is required";
-    else if (!/^\d{10}$/.test(formData.phoneNumber))
-      newErrors.phoneNumber = "Phone number must be exactly 10 digits";
+    else if (!emailRegex.test(formData.email)) newErrors.email = "Enter a valid email address";
+    if (formData.password.length < 6) newErrors.password = "Password must be at least 6 characters";
+    else if (formData.password !== formData.confirmPassword) newErrors.password = "Passwords do not match";
+    if (!formData.phoneNumber.trim()) newErrors.phoneNumber = "Phone number is required";
+    else if (!/^\d{10}$/.test(formData.phoneNumber)) newErrors.phoneNumber = "Phone number must be exactly 10 digits";
 
     setErrors(newErrors);
     if (Object.values(newErrors).some((e) => e)) return;
@@ -390,43 +386,36 @@ const RegisterPage = () => {
 
     const otpVerifyResponse = await verifyOtp(formData.email, otp);
     if (otpVerifyResponse.status >= 300) {
-      toast.error(
-        otpVerifyResponse?.response?.data?.message || "OTP verification failed."
-      );
+      toast.error(otpVerifyResponse?.response?.data?.message || "OTP verification failed.");
       return;
     }
 
     toast.success("Successfully registered!");
     setTimeout(() => navigate("/login"), 1500);
   };
+
   return (
-    <div className="min-h-screen bg-gray-200 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f0fdfa] to-white flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
       <ToastContainer />
       <div className="w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
-        <div className="flex justify-center mb-8 mt-4 gap-[2%] cursor-pointer hover:scale-105 transition-transform duration-300">
-          <img src={agenticLogo} alt="Agentic Logo" className="w-14 h-14" />
-          <div className="text-3xl flex items-center font-bold text-gray-800">
-            <p>AGENTIC</p>
-          </div>
+        <div className="flex justify-center mb-6 mt-4 gap-3 cursor-pointer hover:scale-105 transition-transform duration-300">
+          <img src={eaBot} alt="EA Bot" className="w-12 h-12" />
+          <h1 className="text-3xl font-bold text-[#00968a] tracking-wide">EA BOT</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8 w-full">
+        <div className="backdrop-blur-md bg-white/70 border border-gray-200 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] p-8 w-full animate-fade-up transition-all duration-700 hover:shadow-[0_0_15px_rgba(16,163,149,0.4)]">
           {step === "register" ? (
             <>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-                Create New Account
-              </h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Create New Account</h2>
               <form onSubmit={handleSubmit}>
-                {/* Name */}
                 <InputField
                   icon="fas fa-user"
                   name="name"
-                  placeholder="Name"
+                  placeholder="Full Name"
                   value={formData.name}
                   error={errors.name}
                   onChange={handleInputChange}
                 />
-                {/* Email */}
                 <InputField
                   icon="fas fa-envelope"
                   name="email"
@@ -436,13 +425,8 @@ const RegisterPage = () => {
                   onChange={handleInputChange}
                   type="email"
                 />
-                {/* Phone */}
                 <div className="mb-5">
-                  <div
-                    className={`flex items-center border ${
-                      errors.phoneNumber ? "border-red-500" : "border-gray-300"
-                    } rounded-md px-3 focus-within:border-[#10a395]`}
-                  >
+                  <div className={`flex items-center border ${errors.phoneNumber ? "border-red-500" : "border-gray-300"} rounded-md px-3 focus-within:border-[#10a395]`}>
                     <span className="text-gray-400 text-sm">+91</span>
                     <input
                       type="text"
@@ -453,13 +437,8 @@ const RegisterPage = () => {
                       onChange={handleInputChange}
                     />
                   </div>
-                  {errors.phoneNumber && (
-                    <p className="text-red-600 text-xs mt-1">
-                      {errors.phoneNumber}
-                    </p>
-                  )}
+                  {errors.phoneNumber && <p className="text-red-600 text-xs mt-1">{errors.phoneNumber}</p>}
                 </div>
-                {/* Password */}
                 <PasswordField
                   show={showPassword}
                   toggle={() => setShowPassword(!showPassword)}
@@ -469,7 +448,6 @@ const RegisterPage = () => {
                   onChange={handleInputChange}
                   error={errors.password}
                 />
-                {/* Confirm Password */}
                 <PasswordField
                   show={showPassword}
                   toggle={() => setShowPassword(!showPassword)}
@@ -479,10 +457,31 @@ const RegisterPage = () => {
                   onChange={handleInputChange}
                 />
 
+                {/* Terms & Conditions */}
+                <div className="flex items-start gap-2 mb-4">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <label className="text-sm text-gray-700">
+                    I accept the{" "}
+                    <span
+                      className="text-[#10a395] underline cursor-pointer hover:text-[#0d8a7e]"
+                      onClick={() => setShowTermsModal(true)}
+                    >
+                      Terms & Conditions
+                    </span>
+                  </label>
+                </div>
+
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium"
+                  disabled={loading || !acceptedTerms}
+                  className={`w-full h-12 text-white rounded-md font-medium cursor-pointer transition-colors ${
+                    acceptedTerms ? "bg-[#10a395] hover:bg-[#0d8a7e]" : "bg-gray-400 cursor-not-allowed"
+                  }`}
                 >
                   {loading ? "Registering..." : "Register"}
                 </button>
@@ -490,9 +489,7 @@ const RegisterPage = () => {
             </>
           ) : (
             <>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-                Verify OTP
-              </h2>
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Verify OTP</h2>
               <form onSubmit={handleOtpSubmit}>
                 <input
                   type="text"
@@ -501,9 +498,7 @@ const RegisterPage = () => {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                 />
-                {errors.otp && (
-                  <p className="text-red-600 text-xs mb-2">{errors.otp}</p>
-                )}
+                {errors.otp && <p className="text-red-600 text-xs mb-2">{errors.otp}</p>}
                 <button
                   type="submit"
                   className="w-full h-12 bg-[#10a395] text-white rounded-md hover:bg-[#0d8a7e] transition-colors font-medium mb-3"
@@ -516,12 +511,10 @@ const RegisterPage = () => {
           )}
 
           <div className="flex flex-col items-center justify-center text-center mt-6">
-            <p className="text-sm text-gray-700 mb-2">
-              Already have an account?
-            </p>
+            <p className="text-sm text-gray-700 mb-2">Already have an account?</p>
             <div
               className="text-sm text-[#10a395] flex items-center gap-2 cursor-pointer"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/login")}
             >
               <ArrowRightCircle size={20} />
               <p className="font-medium">Log In</p>
@@ -529,25 +522,37 @@ const RegisterPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Terms Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-white/20 z-50 flex items-center justify-center transition-all">
+          <div className="bg-white p-6 rounded-lg max-w-md shadow-lg text-gray-700">
+            <h2 className="text-xl font-bold mb-2 text-[#10a395]">Terms & Conditions</h2>
+            <p className="text-sm mb-4 max-h-[250px] overflow-y-auto">
+              By using EA BOT, you agree to share your name, email, and phone number
+              for account creation. Your data will remain secure and used only
+              for task-related communication and performance reports.
+              <br />
+              <br />
+              We respect your privacy and ensure compliance with data protection standards.
+              You may contact us for any data removal or concerns.
+            </p>
+            <button
+              onClick={() => setShowTermsModal(false)}
+              className="mt-2 px-4 py-2 bg-[#10a395] text-white rounded hover:bg-[#0d8a7e]"
+            >
+              I Understand
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-const InputField = ({
-  icon,
-  name,
-  placeholder,
-  value,
-  onChange,
-  error,
-  type = "text",
-}) => (
+const InputField = ({ icon, name, placeholder, value, onChange, error, type = "text" }) => (
   <div className="mb-5">
-    <div
-      className={`flex items-center border ${
-        error ? "border-red-500" : "border-gray-300"
-      } rounded-md px-3 focus-within:border-[#10a395]`}
-    >
+    <div className={`flex items-center border ${error ? "border-red-500" : "border-gray-300"} rounded-md px-3 focus-within:border-[#10a395]`}>
       <i className={`${icon} text-gray-400 text-lg`}></i>
       <input
         type={type}
@@ -562,21 +567,9 @@ const InputField = ({
   </div>
 );
 
-const PasswordField = ({
-  name,
-  placeholder,
-  value,
-  onChange,
-  error,
-  show,
-  toggle,
-}) => (
+const PasswordField = ({ name, placeholder, value, onChange, error, show, toggle }) => (
   <div className="mb-5">
-    <div
-      className={`flex items-center border ${
-        error ? "border-red-500" : "border-gray-300"
-      } rounded-md px-3 focus-within:border-[#10a395]`}
-    >
+    <div className={`flex items-center border ${error ? "border-red-500" : "border-gray-300"} rounded-md px-3 focus-within:border-[#10a395]`}>
       <i className="fas fa-lock text-gray-400 text-lg"></i>
       <input
         type={show ? "text" : "password"}

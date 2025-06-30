@@ -266,14 +266,14 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const { user, token, logout } = useAuth(); // ✅ added logout
-  const navigate = useNavigate(); // ✅ used for redirection
+  const { user, token, logout } = useAuth();
+  const navigate = useNavigate();
 
   const { mds, loading, handleReject, handleApprove } = useMDs(user?.id, token);
 
   const handleLogout = () => {
-    logout(); // ⬅️ Clear auth context & localStorage
-    navigate("/"); // ⬅️ Redirect to login
+    logout();
+    navigate("/login");
   };
 
   const filteredMDs = mds.filter((md) => {
@@ -286,33 +286,31 @@ const AdminDashboard = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-4 md:px-8">
+    <div className="min-h-screen bg-gray-50 px-4 py-6">
       <ToastContainer />
 
-      {/* Header with Logout */}
-      <header className="bg-white shadow-sm mb-6 p-4 rounded flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">
-          MD Approval Dashboard
-        </h1>
+      {/* Header */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-6 py-4 mb-6 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-800">MD Approval Dashboard</h1>
         <button
           onClick={handleLogout}
-          className="text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md text-sm font-semibold"
+          className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold cursor-pointer"
         >
-          Logout
+          <i className="fas fa-sign-out-alt mr-2"></i>Logout
         </button>
-      </header>
+      </div>
 
-      {/* Filters & Search */}
-      <div className="bg-white p-4 rounded shadow-sm mb-4 flex flex-col md:flex-row justify-between items-center">
-        <div className="flex gap-2 flex-wrap mb-2 md:mb-0">
+      {/* Filter + Search */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm px-6 py-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-wrap gap-2">
           {["all", "approved", "pending", "rejected"].map((status) => (
             <button
               key={status}
               onClick={() => setActiveFilter(status)}
-              className={`px-4 py-1 rounded-full text-sm font-medium ${
+              className={`px-4 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-200 ${
                 activeFilter === status
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 text-gray-700"
+                  ? "bg-[#00968a] text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -324,54 +322,71 @@ const AdminDashboard = () => {
           placeholder="Search MDs..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border px-3 py-1 rounded w-full md:w-64"
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 focus:ring-[#00968a] focus:border-[#00968a] outline-none"
         />
       </div>
 
-      {/* MD Table */}
-      <div className="overflow-x-auto bg-white shadow rounded-lg">
+      {/* Table */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-x-auto">
         {loading ? (
-          <div className="p-4 text-center text-gray-500">Loading...</div>
+          <div className="text-center py-6 text-gray-500">Loading...</div>
         ) : (
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="text-left px-4 py-2">MD Name</th>
-                <th className="text-left px-4 py-2">Phone</th>
-                <th className="text-left px-4 py-2">Status</th>
-                <th className="text-left px-4 py-2">Action</th>
+          <table className="min-w-full text-sm text-left">
+            <thead className="bg-gray-50">
+              <tr className="text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-6 py-3">MD Name</th>
+                <th className="px-6 py-3">Phone</th>
+                <th className="px-6 py-3">Status</th>
+                <th className="px-6 py-3">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200 text-gray-700">
               {filteredMDs.map((md) => (
-                <tr key={md.id} className="border-t">
-                  <td className="px-4 py-2">{md.mdName}</td>
-                  <td className="px-4 py-2">{md.phoneNumber}</td>
-                  <td className="px-4 py-2 capitalize">{md.approvalStatus}</td>
-                  <td className="px-4 py-2">
+                <tr key={md.id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 font-medium">{md.mdName}</td>
+                  <td className="px-6 py-4">{md.phoneNumber}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+                        md.approvalStatus === "approved"
+                          ? "bg-green-100 text-green-700"
+                          : md.approvalStatus === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {md.approvalStatus}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
                     {md.approvalStatus === "pending" ? (
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleApprove(md.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md"
+                          className="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-md text-sm cursor-pointer"
                         >
                           Approve
                         </button>
                         <button
                           onClick={() => handleReject(md.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"
+                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-md text-sm cursor-pointer"
                         >
                           Reject
                         </button>
                       </div>
                     ) : (
-                      <span className="text-gray-500 capitalize">
-                        {md.approvalStatus}
-                      </span>
+                      <span className="text-gray-500 text-sm capitalize">No Action</span>
                     )}
                   </td>
                 </tr>
               ))}
+              {!filteredMDs.length && (
+                <tr>
+                  <td colSpan="4" className="text-center py-6 text-gray-500">
+                    No MDs found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         )}

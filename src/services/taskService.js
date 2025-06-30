@@ -9,13 +9,13 @@ const fetchTasks = async (mdId, token) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data.taskLogs; // ✅ Only return the array
+
+    return response.data?.data?.taskLogs || []; // 🛠 Proper path to taskLogs
   } catch (error) {
     console.error('Error fetching tasks:', error);
     throw error;
   }
 };
-
 
 export default {
   fetchTasks,

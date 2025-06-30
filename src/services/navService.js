@@ -11,17 +11,16 @@ export const fetchMDName = async (token) => {
   });
 };
 
-// Update Phone Number
-export const updatePhoneNumber = async (phoneNumber, token) => {
-  return await axios.put(
-    `${API_URL}md/update-phone`,
-    {
-      phone_number: `91${phoneNumber}`,
+// Update MD Name and/or Phone Number
+export const updatePhoneNumber = async ({ name, phone }, token) => {
+  const body = {};
+  if (name) body.name = name;
+  if (phone) body.phone_number = `91${phone}`;
+
+  return await axios.put(`${API_URL}md/update-phone`, body, {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  });
 };
+

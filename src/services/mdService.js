@@ -97,7 +97,7 @@ export const getMDList = async (adminId, token) => {
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log("🟩 API Data Received:", response.data); // ✅ Add this
+  // console.log("🟩 API Data Received:", response.data); // ✅ Add this
   return response.data;
 };
 

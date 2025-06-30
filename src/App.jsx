@@ -32,10 +32,10 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom"; // Make sure Navigate is imported here
+} from "react-router-dom";
 import { useState } from "react";
 import MDdashboard from "./pages/MDdashboard";
-import AdminDashboard from "./pages/AdminDashboard"; // Import the Admin Dashboard
+import AdminDashboard from "./pages/AdminDashboard";
 import ManageEmployee from "./pages/ManageEmployee";
 import Layout from "./components/Layout";
 import TaskLogs from "./pages/TaskLogs";
@@ -44,14 +44,15 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import ProtectedRoute from "./components/ProtectedRoute";
+import UserGuide from "./pages/UserGuide";
 
 function App() {
   const [user, setUser] = useState(null); // Replace this with your actual authentication logic
 
   return (
     <Router>
-    <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -62,44 +63,34 @@ function App() {
       />
 
       <Routes>
-        {/* Starting Page - LoginPage */}
-        <Route path="/" element={<LoginPage setUser={setUser} />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage setUser={setUser} />} />
         <Route path="/register" element={<RegisterPage />} />
-        {/* Redirect to login as the starting page */}
-        {/* Routes for pages that need the Layout (sidebar and navbar) */}
-        {/* Route for Admin Dashboard after login */}
+
+        {/* Admin dashboard protected */}
         <Route
           path="/admin-dashboard"
           element={
-            user && user.role === "admin" ? (
+            <ProtectedRoute>
               <AdminDashboard />
-            ) : (
-              <AdminDashboard />
-              // <Navigate to="/login" />
-            )
+            </ProtectedRoute>
           }
         />
-        <Route path="/" element={<Layout />}>
-          {/* Route for MD dashboard after login */}
-          <Route
-            path="/md-dashboard"
-            element={
-              user && user.role === "md" ? (
-                <MDdashboard />
-              ) : (
-                <MDdashboard />
-                // <Navigate to="/login" />
-              )
-            }
-          />
 
-          {/* Other Routes */}
+        {/* MD Layout + child routes protected */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/md-dashboard" element={<MDdashboard />} />
           <Route path="/manage-employee" element={<ManageEmployee />} />
           <Route path="/task-logs" element={<TaskLogs />} />
-          {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/user-guide" element={<UserGuide />} />
         </Route>
-        {/* Routes for Login and Register pages without Layout */}
-        {/* <Route path="/login" element={<LoginPage setUser={setUser} />} /> */}
       </Routes>
     </Router>
   );

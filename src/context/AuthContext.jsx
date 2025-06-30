@@ -64,12 +64,12 @@ export const AuthProvider = ({ children }) => {
   const login = ({ token, user }) => {
     if (token) {
       localStorage.setItem("token", token);
-      console.log("🔐 Stored token:", token);
+      // console.log("🔐 Stored token:", token);
       setToken(token);
     }
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
-      console.log("👤 Stored user:", user);
+      // console.log("👤 Stored user:", user);
       setUser(user);
     }
   };
@@ -82,7 +82,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        setToken,
+        user,
+        setUser,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

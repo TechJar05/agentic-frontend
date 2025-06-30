@@ -1,149 +1,200 @@
-// import React, { useState, useEffect } from 'react';
-// import { Link } from 'react-router-dom';
-
-// const Navbar = ({ setIsProfileOpen, isProfileOpen }) => {
-//   const [mdName, setMdName] = useState(''); 
-  
-//   useEffect(() => {
-//     const fetchMDName = async () => {
-//       try {
-//         const response = await fetch('/api/md'); 
-//         const data = await response.json();
-//         setMdName(data.name); 
-//       } catch (error) {
-//         console.error('Error fetching MD name:', error);
-//       }
-//     };
-
-//     fetchMDName();
-//   }, []); 
-
-//   return (
-//     <header className="bg-white shadow-sm z-10">
-//       <div className="flex items-center justify-between px-6 py-4">
-//         <h1 className="text-2xl font-semibold text-gray-800">{`Welcome, ${mdName || 'MD'}`}</h1> {/* Display MD name */}
-//         <div className="relative">
-//           <button
-//             onClick={() => setIsProfileOpen(!isProfileOpen)}
-//             className="flex items-center focus:outline-none cursor-pointer"
-//           >
-//             <div className="w-10 h-10 rounded-full bg-[#00968a] flex items-center justify-center text-white">
-//               <i className="fas fa-user"></i>
-//             </div>
-//           </button>
-//           {isProfileOpen && (
-//             <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20">
-//               <Link
-//                 to="/profile"
-//                 className="block px-4 py-2 text-gray-800 hover:bg-indigo-100 cursor-pointer"
-//               >
-//                 Profile
-//               </Link>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </header>
-//   );
-// };
-
-// export default Navbar;
-
-
 import React, { useState } from "react";
 import { useNav } from "../hooks/useNav";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { updatePhoneNumber } from "../services/navService";
+import { useAuth } from "../context/authContext";
+import { X } from "lucide-react";
 
 const Navbar = () => {
-  const { mdName, updatePhone,loading } = useNav();
+  const { mdName, loading } = useNav();
+  const { token, setUser } = useAuth();
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showCard, setShowCard] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [phone, setPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [name, setName] = useState("");
+  const [formError, setFormError] = useState("");
 
   const handlePhoneChange = (e) => {
     const val = e.target.value;
     if (!/^\d*$/.test(val) || val.length > 10) return;
     setPhone(val);
-    setPhoneError("");
+    setFormError("");
   };
 
   const handleUpdateClick = async () => {
-    if (phone.length !== 10) {
-      setPhoneError("Phone number must be exactly 10 digits");
-      return;
+    if (name.trim()) {
+      setUser((prev) => {
+        const updatedUser = { ...prev, name: name.trim() };
+        localStorage.setItem("user", JSON.stringify(updatedUser)); // ✅ persist updated name
+        return updatedUser;
+      });
     }
-    const res = await updatePhone(phone);
-    if (res?.success) {
-      toast.success(res.message);
-      setShowCard(false);
-      setPhone("");
-    } else {
-      toast.error(res?.message || "Something went wrong");
-    }
+
+    const payload = {
+      name: name.trim() || "",
+      phone_number: phone.length === 10 ? `91${phone}` : "",
+    };
+
+   try {
+  const res = await updatePhoneNumber(payload, token);
+  if (res?.data?.message) {
+    setUser((prev) => {
+      const updatedUser = {
+        ...prev,
+        ...(name.trim() && { name: name.trim() }),
+        ...(phone.length === 10 && { phoneNumber: "91" + phone }),
+      };
+      localStorage.setItem("user", JSON.stringify(updatedUser)); // ✅ Persist update
+      return updatedUser;
+    });
+
+    if (name && phone)
+      toast.success("Name and Phone updated successfully.");
+    else if (name)
+      toast.success("Name updated successfully.");
+    else
+      toast.success("Phone number updated successfully.");
+
+    setShowModal(false);
+    setPhone("");
+    setName("");
+  } else {
+    toast.error("Something went wrong.");
+  }
+} catch (err) {
+  console.error(err);
+  toast.error("Update failed.");
+}
+
   };
 
   return (
     <>
-      <nav className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-6 py-3 bg-white shadow gap-2 sm:gap-0">
-        <h1 className="text-lg sm:text-xl font-semibold text-center sm:text-left">
-          Welcome, {mdName}
+      <nav className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-6 py-3 bg-white/60 backdrop-blur-md border-b border-gray-300 shadow-[0_4px_20px_rgba(0,0,0,0.05)] z-10 relative">
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-800">
+          Welcome, <span className="text-[#10a395]">{mdName}</span>
         </h1>
 
-        <div className="relative self-end sm:self-auto">
-          <button onClick={() => setDropdownOpen(!dropdownOpen)}>
-            <div className="w-10 h-10 rounded-full bg-[#00968a] flex items-center justify-center text-white">
-              <i className="fas fa-user"></i>
-            </div>
+        <div className="relative">
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="w-10 h-10 rounded-full bg-[#10a395] flex items-center justify-center cursor-pointer text-white border border-white shadow-md hover:shadow-[0_0_10px_rgba(16,163,149,0.5)] transition duration-200"
+          >
+            <i className="fas fa-user text-sm"></i>
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-20">
+            <div className="absolute right-0 mt-3 w-56  bg-white/80 backdrop-blur-xl text-gray-800 rounded-lg border border-gray-200 shadow-xl animate-fade-in-down z-20">
               <button
                 onClick={() => {
-                  setShowCard(true);
+                  setShowModal(true);
                   setDropdownOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+                className="w-full px-4 py-2 text-sm text-left cursor-pointer hover:bg-gray-100 transition"
               >
-                Update Your Phone Number
+                Update Your Profile
               </button>
             </div>
           )}
         </div>
+      </nav>
 
-        {showCard && (
-          <div className="absolute top-16 right-6 w-80 bg-white shadow-lg rounded-lg p-4 z-30">
-            <h3 className="text-lg font-semibold mb-2">Update Your Phone Number</h3>
+      {/* Profile Update Modal */}
+      {showModal && (
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => {
+            setShowModal(false);
+            setFormError("");
+          }}
+        >
+          <div
+            className="bg-white p-6 rounded-xl w-full max-w-md mx-4 shadow-2xl relative animate-fade-in-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-red-500 transition"
+              onClick={() => {
+                setShowModal(false);
+                setFormError("");
+              }}
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Update Your Profile
+            </h3>
+
             <input
               type="text"
-              placeholder="Enter 10-digit number"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setFormError("");
+              }}
+              className="w-full border border-gray-300 rounded-md p-2 text-sm mb-3 focus:ring-2 focus:ring-[#10a395] outline-none"
+            />
+
+            <input
+              type="text"
+              placeholder="10-digit Phone Number"
               value={phone}
               onChange={handlePhoneChange}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm"
+              className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-[#10a395] outline-none"
             />
-            {phoneError && <p className="text-red-500 text-sm mt-1">{phoneError}</p>}
+
+            {formError && (
+              <p className="text-red-500 text-sm mt-2">{formError}</p>
+            )}
 
             <button
               onClick={handleUpdateClick}
-              className="mt-3 w-full bg-[#10a395] text-white px-4 py-2 rounded-md hover:bg-[#0d8a7e]"
+              className="mt-4 w-full bg-[#10a395] cursor-pointer text-white px-4 py-2 rounded-md hover:bg-[#0d8a7e] transition duration-200"
               disabled={loading}
             >
               {loading ? "Updating..." : "Update"}
             </button>
-
-            <button
-              className="text-xs text-gray-500 mt-3 hover:underline"
-              onClick={() => setShowCard(false)}
-            >
-              Close
-            </button>
           </div>
-        )}
-      </nav>
+        </div>
+      )}
 
       <ToastContainer position="top-center" autoClose={3000} />
+
+      {/* Animations */}
+      <style>{`
+        .animate-fade-in-down {
+          animation: fadeInDown 0.3s ease-out;
+        }
+
+        .animate-fade-in-up {
+          animation: fadeInUp 0.3s ease-out;
+        }
+
+        @keyframes fadeInDown {
+          0% {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </>
   );
 };
