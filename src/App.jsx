@@ -48,7 +48,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import UserGuide from "./pages/UserGuide";
 
 function App() {
-  const [user, setUser] = useState(null); // Replace this with your actual authentication logic
+  const [user, setUser] = useState(null); // Replace this with  actual authentication logic
 
   return (
     <Router>
