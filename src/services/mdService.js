@@ -103,7 +103,7 @@ export const getMDList = async (adminId, token) => {
 
 export const approveMD = async (mdId, token) => {
   const response = await axios.post(
-    `${API_URL}admin/approve-md/${mdId}`,
+    `${API_URL}api/admin/approve-md/${mdId}`,
     {},
     {
       headers: {
@@ -116,7 +116,7 @@ export const approveMD = async (mdId, token) => {
 
 export const rejectMD = async (mdId, token) => {
   const response = await axios.post(
-    `${API_URL}admin/reject-md/${mdId}`,
+    `${API_URL}api/admin/reject-md/${mdId}`,
     {},
     {
       headers: {
