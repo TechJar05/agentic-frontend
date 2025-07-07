@@ -92,7 +92,7 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const getMDList = async (adminId, token) => {
-  const response = await axios.get(`${API_URL}admin/md-list/${adminId}`, {
+  const response = await axios.get(`${API_URL}api/admin/md-list/${adminId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
