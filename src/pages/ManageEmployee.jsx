@@ -77,7 +77,12 @@ const ManageEmployee = () => {
     };
     await handleAddEmployee(payload);
     setShowAddEmployeeModal(false);
-    setNewEmployee({ name: "", phoneNumber: "", taskCapacity: "", department: "" });
+    setNewEmployee({
+      name: "",
+      phoneNumber: "",
+      taskCapacity: "",
+      department: "",
+    });
   };
 
   const openUpdatePhoneModal = (employee) => {
@@ -192,24 +197,31 @@ const ManageEmployee = () => {
       {showAddEmployeeModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 w-full max-w-md rounded-xl shadow-xl">
-            <h3 className="text-lg font-semibold mb-4 cursor-pointer text-center">Add Employee</h3>
+            <h3 className="text-lg font-semibold mb-4 cursor-pointer text-center">
+              Add Employee
+            </h3>
             <form onSubmit={handleFormSubmit} className="space-y-4">
-              {["name", "phoneNumber", "taskCapacity", "department"].map((field) => (
-                <input
-                  key={field}
-                  name={field}
-                  type={field === "taskCapacity" ? "number" : "text"}
-                  placeholder={
-                    field === "taskCapacity"
-                      ? "Task Capacity"
-                      : field.charAt(0).toUpperCase() + field.slice(1)
-                  }
-                  required
-                  value={newEmployee[field]}
-                  onChange={handleNewEmployeeChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#00968a] outline-none"
-                />
-              ))}
+              {["name", "phoneNumber", "taskCapacity", "department"].map(
+                (field) => (
+                  <input
+                    key={field}
+                    name={field}
+                    type={field === "taskCapacity" ? "number" : "text"}
+                    placeholder={
+                      field === "name"
+                        ? "Add Only First Name"
+                        : field === "taskCapacity"
+                        ? "Task Capacity"
+                        : field.charAt(0).toUpperCase() + field.slice(1)
+                    }
+                    required
+                    value={newEmployee[field]}
+                    onChange={handleNewEmployeeChange}
+                    className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#00968a] outline-none"
+                  />
+                )
+              )}
+
               <div className="flex justify-between mt-4">
                 <button
                   type="button"
@@ -234,7 +246,9 @@ const ManageEmployee = () => {
       {showUpdatePhoneModal && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 w-full max-w-md rounded-xl shadow-xl">
-            <h3 className="text-lg font-semibold mb-4 cursor-pointer text-center">Update Employee</h3>
+            <h3 className="text-lg font-semibold mb-4 cursor-pointer text-center">
+              Update Employee
+            </h3>
             <form onSubmit={handleUpdatePhoneSubmit} className="space-y-4">
               <input
                 type="text"
