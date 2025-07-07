@@ -48,7 +48,6 @@ export const useLogin = () => {
       setLoading(true);
 
       const response = await loginUser({ email, password, role });
-
       const { access_token, id, name, role: userRole } = response.data;
 
       if (!access_token) {
@@ -63,6 +62,13 @@ export const useLogin = () => {
       return { status: 200, data: response.data };
     } catch (error) {
       const status = error?.response?.status || 500;
+
+      // ✅ Explicit handling of 403 error
+      if (status === 403) {
+        const message = error?.response?.data?.detail || "Access forbidden";
+        return { status: 403, data: { message } };
+      }
+
       const message = error?.response?.data?.message || "Login failed";
       return { status, data: { message } };
     } finally {
@@ -72,4 +78,5 @@ export const useLogin = () => {
 
   return { login: loginHandler, loading };
 };
+
 export default useLogin;
