@@ -17,7 +17,7 @@ export const updatePhoneNumber = async ({ name, phone }, token) => {
   if (name) body.name = name;
   if (phone) body.phone_number = `91${phone}`;
 
-  return await axios.put(`${API_URL}md/update-phone`, body, {
+  return await axios.put(`${API_URL}api/md_dashboard/md/update-phone`, body, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

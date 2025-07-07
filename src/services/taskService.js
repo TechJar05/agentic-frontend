@@ -4,7 +4,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchTasks = async (mdId, token) => {
   try {
-    const response = await axios.get(`${API_URL}md/task-logs/${mdId}`, {
+    const response = await axios.get(`${API_URL}api/md_dashboard/md/task-logs/${mdId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
